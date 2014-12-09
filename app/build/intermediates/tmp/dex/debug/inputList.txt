@@ -1,0 +1,5 @@
+C:\Users\Cameron\AndroidstudioProjects\USADaysMonitor\app\build\intermediates\classes\debug
+C:\Users\Cameron\AndroidstudioProjects\USADaysMonitor\app\build\intermediates\pre-dexed\debug\support-annotations-21.0.2-5858044a8c06b358c5de223a93e6f38b21739893.jar
+C:\Users\Cameron\AndroidstudioProjects\USADaysMonitor\app\build\intermediates\pre-dexed\debug\internal_impl-21.0.2-ab67ab4d97e276bfd18cc570113f9cd3e57d260a.jar
+C:\Users\Cameron\AndroidstudioProjects\USADaysMonitor\app\build\intermediates\pre-dexed\debug\classes-19b15f89a92e12198044cc83834ba32adac8ab37.jar
+C:\Users\Cameron\AndroidstudioProjects\USADaysMonitor\app\build\intermediates\pre-dexed\debug\classes-ea37da5897b5f9479d9323436e49695331fa0cf0.jar

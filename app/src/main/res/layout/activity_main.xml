@@ -1,0 +1,73 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.caniborrowyourphone.usa.MainActivity" >
+
+    <TextView
+        android:id="@+id/headerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/header_text_view" />
+
+    <TextView
+        android:id="@+id/numDaysTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/headerTextView"
+        android:layout_centerHorizontal="true"
+        android:text="@string/num_days_text_view"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <Button
+        android:id="@+id/enteringCanadaButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/headerTextView"
+        android:layout_below="@+id/numDaysTextView"
+        android:layout_marginTop="40dp"
+        android:layout_toLeftOf="@+id/numDaysTextView"
+        android:text="@string/entering_canada" />
+
+    <Button
+        android:id="@+id/enteringUSAButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/enteringCanadaButton"
+        android:layout_toRightOf="@+id/numDaysTextView"
+        android:text="@string/entering_usa" />
+
+    <TextView
+        android:id="@+id/currentlyInTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="@string/currently_in"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/locationTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/currentlyInTextView"
+        android:layout_centerHorizontal="true"
+        android:text="@string/no_mans_land" />
+
+    <Button
+        android:id="@+id/viewCalendarButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/locationTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="34dp"
+        android:onClick="viewCalendar"
+        android:text="@string/view_calendar_button" />
+
+</RelativeLayout>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">USA Days Monitor</string>
+    <string name="action_settings">Settings</string>
+    <string name="entering_canada">Entering Canada</string>
+    <string name="entering_usa">Entering USA</string>
+    <string name="header_text_view">Number of days in the USA this calendar year:</string>
+    <string name="num_days_text_view">0</string>
+    <string name="currently_in">Currently in:</string>
+    <string name="canada">Canada</string>
+    <string name="usa">USA</string>
+    <string name="no_mans_land">No man\'s land</string>
+    <string name="view_calendar_button">View Calendar</string>
+    <string name="title_activity_calendar">Calendar</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_calendar_view">Calendar</string>
+    <string name="months_prompt">Select a month...</string>
+    <string-array name="months">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <string name="select_month">Select Month:</string>
+	<string name="days_in_usa">Days you were in the USA for month selected:</string>
+	<string name="none">None!</string>
+	
+</resources>
