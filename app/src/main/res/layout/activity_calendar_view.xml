@@ -23,7 +23,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/selectMonthTextView"
         android:layout_centerHorizontal="true"
-        android:entries="@array/months"
         android:prompt="@string/months_prompt" />
 
     <TextView

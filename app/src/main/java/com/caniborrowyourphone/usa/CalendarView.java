@@ -2,11 +2,13 @@ package com.caniborrowyourphone.usa;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -21,18 +23,26 @@ public class CalendarView extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        Log.d("CalendarView", "Entering onCreate");
 		
 		selectMonthSpinner = (Spinner) findViewById(R.id.selectMonthSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.months, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        selectMonthSpinner.setAdapter(adapter);
 		daysInUSATV = (TextView) findViewById(R.id.daysInUSATextView);
 		daysOfSelectedMonthInUSA = new boolean[31];
 		
 		setContentView(R.layout.activity_calendar_view);
 		
-//		addItemSelectedListenerToSpinner();
+		addItemSelectedListenerToSpinner();
 		updateDaysInUSAList();
+
+        Log.d("CalendarView", "Exiting onCreate");
 	}
 	
 	private void addItemSelectedListenerToSpinner() {
+        Log.d("CalendarView", "Entering addItemSelectedListenerToSpinner");
 		selectMonthSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 			@Override
@@ -75,26 +85,32 @@ public class CalendarView extends ActionBarActivity {
 			}
 			
 		});
+        Log.d("CalendarView", "Exiting addItemSelectedListenerToSpinner");
 	}
 	
 	private void updateDaysInUSAList() {
+        Log.d("CalendarView", "Entering updateDaysInUSAList");
 		boolean firstDay = true;
 		daysToDisplay = "";
 		for(int i=0; i<31; i++) {
 			if(MainActivity.inUSA[selectedMonth][i]) {
 				if(firstDay) {
+                    Log.d("CalendarView", "updateDaysInUSAList: Adding first day to list:" + i+1);
 					daysToDisplay+= Integer.toString(i+1);
 					firstDay = false;
 				}
 				else {
-					daysToDisplay += ", " + Integer.toString(i+1);
-				}
+                    Log.d("CalendarView", "updateDaysInUSAList: Adding day to list:" + i+1);
+                    daysToDisplay += ", " + Integer.toString(i + 1);
+                }
 			}
 		}
 		if(firstDay) { // No days in USA
 			daysToDisplay = "None";
 		}
+        Log.d("CalendarView", "updateDaysInUSAList: daysToDisplay=" + daysToDisplay);
 		daysInUSATV.setText(daysToDisplay);
+        Log.d("CalendarView", "Exiting updateDaysInUSAList");
 	}
 
 	@Override

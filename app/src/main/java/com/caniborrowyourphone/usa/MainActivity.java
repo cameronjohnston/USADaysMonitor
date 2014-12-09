@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,6 +53,9 @@ public class MainActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+        Log.d("MainActivity", "Entering onCreate");
+
 		setContentView(R.layout.activity_main);
 		
 		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
@@ -70,7 +74,9 @@ public class MainActivity extends ActionBarActivity {
 		today = Calendar.getInstance(); // Initialize to current date
 		inUSA[today.get(Calendar.MONTH)][today.get(Calendar.DAY_OF_MONTH) - 1] = false;
 		updateDayCount();
-	}
+
+        Log.d("MainActivity", "Exiting onCreate");
+}
 	
 	private void setDailyAlarm() {
 		alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
@@ -116,6 +122,7 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	private void initializeDayCount() {
+        Log.d("MainActivity", "Entering initializeDayCount");
 		int i, j;
 		numDaysInUSA = 0;
 		boolean fileExists = true;
@@ -129,6 +136,7 @@ public class MainActivity extends ActionBarActivity {
 			e.printStackTrace();
 		}
 		if(fileExists) {
+            Log.d("MainActivity", "initializeDayCount: File exists! Reading inputBytes...");
 			try {
 				fis.read(inputBytes);
 				fis.close();
@@ -139,6 +147,7 @@ public class MainActivity extends ActionBarActivity {
 			for(i=0; i<12; i++) { // For each month
 				for(j=0; j<31; j++) { // For each day of the month
 					if(inputBytes[i*31 + j] > 0) {
+                        Log.d("MainActivity", "initializeDayCount: inUSA=true for day: " + i+1 + "/" + j+1);
 						inUSA[i][j] = true;
 						numDaysInUSA++;
 					}
@@ -148,11 +157,14 @@ public class MainActivity extends ActionBarActivity {
 				}
 			}
 		}
+        Log.d("MainActivity", "Exiting initializeDayCount. numDaysInUSA=" + numDaysInUSA);
 		numDaysTV.setText(Integer.toString(numDaysInUSA));
 	}
 	
 	private void updateDayCount() {
+        Log.d("MainActivity", "Entering updateDayCount");
 		if(currentCountry == Country.USA) { // Set today to true
+            Log.d("MainActivity", "updateDayCount: Currently in USA");
 			inUSA[today.get(Calendar.MONTH)][today.get(Calendar.DAY_OF_MONTH - 1)] = true;
 		}
 		int index = 0;
@@ -164,24 +176,29 @@ public class MainActivity extends ActionBarActivity {
 			}
 		}
 		try {
+            Log.d("MainActivity", "updateDayCount: Opening file: " + FILENAME);
 			fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		try {
+            Log.d("MainActivity", "updateDayCount: Writing outputBytes to file: " + FILENAME);
 			fos.write(outputBytes);
 			fos.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        Log.d("MainActivity", "Exiting updateDayCount: numDaysInUSA=" + numDaysInUSA);
 		numDaysTV.setText(Integer.toString(numDaysInUSA));
 	}
 	
 	public void viewCalendar(View view) {
+        Log.d("MainActivity", "Entering viewCalendar");
 		Intent i = new Intent(this, CalendarView.class);
 		startActivity(i);
+        Log.d("MainActivity", "Exiting viewCalendar. ViewCalendar activity should have just started.");
 	}
 
 	@Override
