@@ -12,7 +12,46 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-public class CalendarView extends ActionBarActivity {
+public class CalendarView extends ActionBarActivity implements OnItemSelectedListener {
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view,
+                               int position, long id) {
+        String selected_month = (String)selectMonthSpinner.getSelectedItem();
+        switch(selected_month) {
+            case "January":
+                selectedMonth = 0;
+            case "February":
+                selectedMonth = 1;
+            case "March":
+                selectedMonth = 2;
+            case "April":
+                selectedMonth = 3;
+            case "May":
+                selectedMonth = 4;
+            case "June":
+                selectedMonth = 5;
+            case "July":
+                selectedMonth = 6;
+            case "August":
+                selectedMonth = 7;
+            case "September":
+                selectedMonth = 8;
+            case "October":
+                selectedMonth = 9;
+            case "November":
+                selectedMonth = 10;
+            case "December":
+                selectedMonth = 11;
+            default:
+                selectedMonth = 0;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
 
 	boolean daysOfSelectedMonthInUSA[];
 	int selectedMonth;
@@ -30,7 +69,8 @@ public class CalendarView extends ActionBarActivity {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.months, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectMonthSpinner.setAdapter(adapter);
-		daysInUSATV = (TextView) findViewById(R.id.daysInUSATextView);
+
+        daysInUSATV = (TextView) findViewById(R.id.daysInUSATextView);
 		daysOfSelectedMonthInUSA = new boolean[31];
 		
 		setContentView(R.layout.activity_calendar_view);
@@ -43,48 +83,7 @@ public class CalendarView extends ActionBarActivity {
 	
 	private void addItemSelectedListenerToSpinner() {
         Log.d("CalendarView", "Entering addItemSelectedListenerToSpinner");
-		selectMonthSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int position, long id) {
-				String selected_month = (String)selectMonthSpinner.getSelectedItem();
-				switch(selected_month) {
-				case "January":
-					selectedMonth = 0;
-				case "February":
-					selectedMonth = 1;
-				case "March":
-					selectedMonth = 2;
-				case "April":
-					selectedMonth = 3;
-				case "May":
-					selectedMonth = 4;
-				case "June":
-					selectedMonth = 5;
-				case "July":
-					selectedMonth = 6;
-				case "August":
-					selectedMonth = 7;
-				case "September":
-					selectedMonth = 8;
-				case "October":
-					selectedMonth = 9;
-				case "November":
-					selectedMonth = 10;
-				case "December":
-					selectedMonth = 11;
-				default:
-					selectedMonth = 0;
-				}
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-								
-			}
-			
-		});
+		//selectMonthSpinner.setOnItemSelectedListener(this);
         Log.d("CalendarView", "Exiting addItemSelectedListenerToSpinner");
 	}
 	
@@ -109,7 +108,7 @@ public class CalendarView extends ActionBarActivity {
 			daysToDisplay = "None";
 		}
         Log.d("CalendarView", "updateDaysInUSAList: daysToDisplay=" + daysToDisplay);
-		daysInUSATV.setText(daysToDisplay);
+		daysInUSATV.setText((CharSequence)daysToDisplay);
         Log.d("CalendarView", "Exiting updateDaysInUSAList");
 	}
 

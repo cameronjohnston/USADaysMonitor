@@ -23,7 +23,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/selectMonthTextView"
         android:layout_centerHorizontal="true"
-        android:prompt="@string/months_prompt" />
+        android:prompt="@string/months_prompt"
+        android:entries="@array/months"/>
 
     <TextView
         android:id="@+id/daysInUSAMessageTextView"
