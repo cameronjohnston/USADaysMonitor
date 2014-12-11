@@ -24,7 +24,7 @@ public class Data extends MainActivity {
         inUSA = new boolean[12][31];
         numDaysInUSA = 0;
 
-        monthOfLastUpdate = 0x0;
-        dayOfLastUpdate = 0x0;
+        monthOfLastUpdate = 0x0; // Should always be between 0-11 inclusive
+        dayOfLastUpdate = 0x0; // Should always be between 0-30 inclusive
     }
 }

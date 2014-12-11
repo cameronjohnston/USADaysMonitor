@@ -142,6 +142,7 @@ public class MainActivity extends ActionBarActivity {
 		readDaysFromFile();
         readCountryFromFile();
         readTimestampFromFile();
+        updateDaysSinceTimestamp();
         Log.d("MainActivity", "Exiting initializeDayCount. numDaysInUSA=" + data.numDaysInUSA);
 		// numDaysTV.setText(Integer.toString(data.numDaysInUSA));
 	}
@@ -163,6 +164,160 @@ public class MainActivity extends ActionBarActivity {
         Log.d("MainActivity", "Exiting updateDayCount: numDaysInUSA=" + data.numDaysInUSA);
 		numDaysTV.setText(Integer.toString(data.numDaysInUSA));
 	}
+
+    private void updateDaysSinceTimestamp() {
+        Log.d("MainActivity", "Entering updateDaysSinceTimestamp");
+        int i, j; // Using i to iterate through months, j to iterate through days
+        if((int)data.monthOfLastUpdate < today.get(Calendar.MONTH)) { // Updated in a previous month
+            Log.d("MainActivity", "updateDaysSinceTimestamp: updated in a previous month");
+
+            // First go through the month last updated, starting with the day after the last update
+            for(j=(int)data.dayOfLastUpdate + 1; j<getNumDaysInMonth((int)data.monthOfLastUpdate); j++) {
+                if(data.currentCountry == Country.USA) {
+                    Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+data.monthOfLastUpdate+"]["+j+"]=true");
+                    data.inUSA[(int)data.monthOfLastUpdate][j] = true;
+                }
+                else {
+                    Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+data.monthOfLastUpdate+"]["+j+"]=false");
+                    data.inUSA[(int)data.monthOfLastUpdate][j] = false;
+                }
+            }
+
+            // Now go through the months between monthOfLastUpdate and today
+            for(i=(int)data.monthOfLastUpdate + 1; i<today.get(Calendar.MONTH); i++) {
+                // In this case, we need to go through every day of the month
+                for(j=0; j<getNumDaysInMonth(i); j++) {
+                    if(data.currentCountry == Country.USA) {
+                        Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+i+"]["+j+"]=true");
+                        data.inUSA[i][j] = true;
+                    }
+                    else {
+                        Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+i+"]["+j+"]=false");
+                        data.inUSA[i][j] = false;
+                    }
+                }
+            }
+
+            // Now go through the days before today in the current month
+            for(j=0; j<today.get(Calendar.DAY_OF_MONTH) - 1; j++) {
+                if(data.currentCountry == Country.USA) {
+                    Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+today.get(Calendar.MONTH)+"]["+j+"]=true");
+                    data.inUSA[today.get(Calendar.MONTH)][j] = true;
+                }
+                else {
+                    Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+today.get(Calendar.MONTH)+"]["+j+"]=false");
+                    data.inUSA[today.get(Calendar.MONTH)][j] = false;
+                }
+            }
+        }
+
+        else if((int)data.monthOfLastUpdate > today.get(Calendar.MONTH)) { // Updated in a later month, therefore must be from the previous year
+            Log.d("MainActivity", "updateDaysSinceTimestamp: updated in a later month, previous year");
+
+            // First go through the month last updated, starting with the day after the last update
+            for(j=(int)data.dayOfLastUpdate + 1; j<getNumDaysInMonth((int)data.monthOfLastUpdate); j++) {
+                if(data.currentCountry == Country.USA) {
+                    Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+data.monthOfLastUpdate+"]["+j+"]=true");
+                    data.inUSA[(int)data.monthOfLastUpdate][j] = true;
+                }
+                else {
+                    Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+data.monthOfLastUpdate+"]["+j+"]=false");
+                    data.inUSA[(int)data.monthOfLastUpdate][j] = false;
+                }
+            }
+
+            // Now go through the months between monthOfLastUpdate and end of the year
+            for(i=(int)data.monthOfLastUpdate + 1; i<12; i++) {
+                // In this case, we need to go through every day of the month
+                for(j=0; j<getNumDaysInMonth((int)data.monthOfLastUpdate); j++) {
+                    if(data.currentCountry == Country.USA) {
+                        Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+i+"]["+j+"]=true");
+                        data.inUSA[i][j] = true;
+                    }
+                    else {
+                        Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+i+"]["+j+"]=false");
+                        data.inUSA[i][j] = false;
+                    }
+                }
+            }
+
+            // Now go through the months between start of the year and month before today
+            for(i=0; i<today.get(Calendar.MONTH); i++) {
+                // In this case, we need to go through every day of the month
+                for(j=0; j<getNumDaysInMonth((int)data.monthOfLastUpdate); j++) {
+                    if(data.currentCountry == Country.USA) {
+                        Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+i+"]["+j+"]=true");
+                        data.inUSA[i][j] = true;
+                    }
+                    else {
+                        Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+i+"]["+j+"]=false");
+                        data.inUSA[i][j] = false;
+                    }
+                }
+            }
+
+            // Now go through the days before today in the current month
+            for(j=0; j<today.get(Calendar.DAY_OF_MONTH) - 1; j++) {
+                if(data.currentCountry == Country.USA) {
+                    Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+today.get(Calendar.MONTH)+"]["+j+"]=true");
+                    data.inUSA[today.get(Calendar.MONTH)][j] = true;
+                }
+                else {
+                    Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+today.get(Calendar.MONTH)+"]["+j+"]=false");
+                    data.inUSA[today.get(Calendar.MONTH)][j] = false;
+                }
+            }
+        }
+
+        else { // monthOfLastUpdate must equal today's month
+            Log.d("MainActivity", "updateDaysSinceTimestamp: updated this month");
+            // Go through all days after dayOfLastUpdate and before today
+            for(j=(int)data.dayOfLastUpdate + 1; j<today.get(Calendar.DAY_OF_MONTH) - 1; j++) {
+                if(data.currentCountry == Country.USA) {
+                    Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+today.get(Calendar.MONTH)+"]["+j+"]=true");
+                    data.inUSA[today.get(Calendar.MONTH)][j] = true;
+                }
+                else {
+                    Log.d("MainActivity", "updateDaysSinceTimestamp: Setting inUSA["+today.get(Calendar.MONTH)+"]["+j+"]=false");
+                    data.inUSA[today.get(Calendar.MONTH)][j] = false;
+                }
+            }
+        }
+
+        Log.d("MainActivity", "Exiting updateDaysSinceTimestamp");
+    }
+
+    int getNumDaysInMonth(int month) {
+        switch(month) {
+            case 0:
+                return 31;
+            case 1:
+                if(today.get(Calendar.YEAR) % 4 == 0) return 29;
+                else return 28;
+            case 2:
+                return 31;
+            case 3:
+                return 30;
+            case 4:
+                return 31;
+            case 5:
+                return 30;
+            case 6:
+                return 31;
+            case 7:
+                return 31;
+            case 8:
+                return 30;
+            case 9:
+                return 31;
+            case 10:
+                return 30;
+            case 11:
+                return 31;
+            default:
+                return 31;
+        }
+    }
 
     private void readDaysFromFile() {
         int i, j;
@@ -310,8 +465,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void writeTimestampToFile() {
-        twoOutputBytes[0] = (byte) today.get(Calendar.MONTH);
-        twoOutputBytes[1] = (byte) today.get(Calendar.DAY_OF_MONTH);
+        twoOutputBytes[0] = (byte) (today.get(Calendar.MONTH));
+        twoOutputBytes[1] = (byte) (today.get(Calendar.DAY_OF_MONTH ) - 1);
         try {
             Log.d("MainActivity", "writeTimestampToFile: Opening file: " + FILENAME_TIMESTAMP);
             fos = openFileOutput(FILENAME_TIMESTAMP, Context.MODE_PRIVATE);
