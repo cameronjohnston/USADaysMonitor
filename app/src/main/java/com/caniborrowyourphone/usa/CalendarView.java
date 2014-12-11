@@ -14,6 +14,12 @@ import android.widget.TextView;
 
 public class CalendarView extends ActionBarActivity implements OnItemSelectedListener {
 
+    boolean daysOfSelectedMonthInUSA[];
+    int selectedMonth;
+    Spinner selectMonthSpinner;
+    String daysToDisplay;
+    TextView daysInUSATV;
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view,
                                int position, long id) {
@@ -52,12 +58,6 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
-
-	boolean daysOfSelectedMonthInUSA[];
-	int selectedMonth;
-	Spinner selectMonthSpinner;
-	String daysToDisplay;
-	TextView daysInUSATV;
 		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 		setContentView(R.layout.activity_calendar_view);
 		
 		addItemSelectedListenerToSpinner();
-		updateDaysInUSAList();
+		// updateDaysInUSAList();
 
         Log.d("CalendarView", "Exiting onCreate");
 	}
@@ -86,13 +86,14 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 		//selectMonthSpinner.setOnItemSelectedListener(this);
         Log.d("CalendarView", "Exiting addItemSelectedListenerToSpinner");
 	}
-	
+
+    /*
 	private void updateDaysInUSAList() {
         Log.d("CalendarView", "Entering updateDaysInUSAList");
 		boolean firstDay = true;
 		daysToDisplay = "";
 		for(int i=0; i<31; i++) {
-			if(MainActivity.inUSA[selectedMonth][i]) {
+			if(data.inUSA[selectedMonth][i]) {
 				if(firstDay) {
                     Log.d("CalendarView", "updateDaysInUSAList: Adding first day to list:" + i+1);
 					daysToDisplay+= Integer.toString(i+1);
@@ -111,6 +112,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 		daysInUSATV.setText((CharSequence)daysToDisplay);
         Log.d("CalendarView", "Exiting updateDaysInUSAList");
 	}
+	*/
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

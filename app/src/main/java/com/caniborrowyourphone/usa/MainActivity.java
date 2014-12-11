@@ -22,65 +22,85 @@ import java.util.Arrays;
 import java.util.Calendar;
 
 public class MainActivity extends ActionBarActivity {
-	
-	protected static final int NUM_BYTES_FOR_STORING_DAYS = 12*31;
-	protected static final String FILENAME = "usa_days_records.txt";
-    protected static final String FILENAME_COUNTRY = "current_country.txt";
 
-	public static boolean[][] inUSA = new boolean[12][31];
-	private int numDaysInUSA = 0;
+    protected static final int NUM_BYTES_FOR_STORING_DAYS = 12*31;
+    protected static final String FILENAME_DAYS = "usa_days_records.txt";
+    protected static final String FILENAME_COUNTRY = "current_country.txt";
+    protected static final String FILENAME_TIMESTAMP = "timestamp.txt";
+
+    private FileInputStream fis;
+    private byte[] inputBytes, outputBytes, twoOutputBytes;
+    private FileOutputStream fos;
+
+    Data data;
+
 	Button enteringCanadaButton, enteringUSAButton;
-	Country currentCountry;
 	TextView locationTV, numDaysTV;
 	Calendar today, alarmCalendar;
 	LocationManager locationManager;
-	FileInputStream fis;
-	byte[] inputBytes, outputBytes;
-	FileOutputStream fos;
+
+    private AlarmReceiver ar;
 	AlarmManager alarmMgr;
 	Intent alarmIntent;
 	PendingIntent alarmPendingIntent;
-	
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         Log.d("MainActivity", "Entering onCreate");
 
-		setContentView(R.layout.activity_main);
-		
-		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		
-		enteringCanadaButton = (Button) findViewById(R.id.enteringCanadaButton);
-		enteringUSAButton = (Button) findViewById(R.id.enteringUSAButton);
-		setButtonOnClickListeners();
-		
-		locationTV = (TextView) findViewById(R.id.locationTextView);
-		numDaysTV = (TextView) findViewById(R.id.numDaysTextView);
-		
-		inputBytes = new byte[NUM_BYTES_FOR_STORING_DAYS];
-		outputBytes = new byte[NUM_BYTES_FOR_STORING_DAYS];
-        today = Calendar.getInstance(); // Initialize to current date
-		initializeDayCount();
+        setContentView(R.layout.activity_main);
 
-		updateDayCount();
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        enteringCanadaButton = (Button) findViewById(R.id.enteringCanadaButton);
+        enteringUSAButton = (Button) findViewById(R.id.enteringUSAButton);
+        setButtonOnClickListeners();
+
+        locationTV = (TextView) findViewById(R.id.locationTextView);
+        numDaysTV = (TextView) findViewById(R.id.numDaysTextView);
+
+        Log.d("MainActivity", "Exiting onCreate");
+    }
+
+    @Override
+    protected void onStart() { super.onStart(); }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("MainActivity", "Entering onResume");
+
+        data = new Data();
+
+        inputBytes = new byte[NUM_BYTES_FOR_STORING_DAYS];
+        outputBytes = new byte[NUM_BYTES_FOR_STORING_DAYS];
+        twoOutputBytes = new byte[2];
+
+        today = Calendar.getInstance(); // Initialize to current date
+        initializeDayCount();
+
+        updateDayCount();
 
         updateLocationDisplay();
 
-        setDailyAlarm(getApplicationContext());
+        ar = new AlarmReceiver();
+        setDailyAlarm(this.getApplicationContext());
 
-        Log.d("MainActivity", "Exiting onCreate");
-}
+        Log.d("MainActivity", "Exiting onResume");
+    }
 	
 	private void setDailyAlarm(Context con) {
         Log.d("MainActivity", "Entering setDailyAlarm");
 		alarmMgr = (AlarmManager) con.getSystemService(Context.ALARM_SERVICE);
 		alarmIntent = new Intent(con, AlarmReceiver.class);
+        alarmPendingIntent = PendingIntent.getBroadcast(con, 0, alarmIntent, 0);
 		alarmCalendar = Calendar.getInstance();
 		alarmCalendar.setTimeInMillis(System.currentTimeMillis());
-		alarmCalendar.set(Calendar.HOUR_OF_DAY, 12);
-		alarmCalendar.set(Calendar.MINUTE, 12);
-		alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, alarmCalendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmPendingIntent);
+		alarmCalendar.set(Calendar.HOUR_OF_DAY, 14);
+		alarmCalendar.set(Calendar.MINUTE, 27);
+		alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000*30, alarmPendingIntent);
         Log.d("MainActivity", "Exiting setDailyAlarm");
     }
 	
@@ -89,7 +109,7 @@ public class MainActivity extends ActionBarActivity {
 
 			@Override
 			public void onClick(View v) {
-				currentCountry = Country.CANADA;
+				data.currentCountry = Country.CANADA;
 				updateDayCount();
 				updateLocationDisplay();
 			}
@@ -100,7 +120,7 @@ public class MainActivity extends ActionBarActivity {
 
 			@Override
 			public void onClick(View v) {
-				currentCountry = Country.USA;
+				data.currentCountry = Country.USA;
 				updateDayCount();
 				updateLocationDisplay();
 			}
@@ -109,41 +129,51 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	private void updateLocationDisplay() {
-		if(currentCountry == Country.CANADA) {
+		if(data.currentCountry == Country.CANADA) {
 			locationTV.setText("Canada");
 		}
-		else if(currentCountry == Country.USA) {
+		else if(data.currentCountry == Country.USA) {
 			locationTV.setText("USA");
 		}
 	}
 	
 	private void initializeDayCount() {
         Log.d("MainActivity", "Entering initializeDayCount, calling readDaysFromFile and readCountryFromFile methods");
-		int numDaysInUSA = readDaysFromFile();
-        boolean currentlyInUSA = readCountryFromFile();
-        if(currentlyInUSA) {
-            currentCountry = Country.USA;
-            Log.d("MainActivity", "Setting currentCountry to USA");
-        }
-        else {
-            currentCountry = Country.CANADA;
-            Log.d("MainActivity", "Setting currentCountry to Canada");
-        }
-        Log.d("MainActivity", "Exiting initializeDayCount. numDaysInUSA=" + numDaysInUSA);
-		numDaysTV.setText(Integer.toString(numDaysInUSA));
+		readDaysFromFile();
+        readCountryFromFile();
+        readTimestampFromFile();
+        Log.d("MainActivity", "Exiting initializeDayCount. numDaysInUSA=" + data.numDaysInUSA);
+		// numDaysTV.setText(Integer.toString(data.numDaysInUSA));
 	}
 
-    // RETURNS: Number of days in USA in the past year (numDaysInUSA)
-    protected int readDaysFromFile() {
+    private void updateDayCount() {
+        Log.d("MainActivity", "Entering updateDayCount");
+		if(data.currentCountry == Country.USA) { // Set today to true
+			data.inUSA[today.get(Calendar.MONTH)][today.get(Calendar.DAY_OF_MONTH) - 1] = true;
+            Log.d("MainActivity", "updateDayCount: currentCountry = USA. Setting entry of inUSA to true: [" + today.get(Calendar.MONTH) + "][" + (today.get(Calendar.DAY_OF_MONTH) - 1) + "]");
+		}
+
+        Log.d("MainActivity", "updateDayCount: calling writeDaysToFile method, numDaysInUSA=" + data.numDaysInUSA);
+        writeDaysToFile();
+        Log.d("MainActivity", "updateDayCount: calling writeCountryToFile method, currentCountry=" + data.currentCountry);
+        writeCountryToFile();
+        Log.d("MainActivity", "updateDayCount: calling writeTimestampToFile method, month=" + data.monthOfLastUpdate + ", day=" + data.dayOfLastUpdate);
+        writeTimestampToFile();
+
+        Log.d("MainActivity", "Exiting updateDayCount: numDaysInUSA=" + data.numDaysInUSA);
+		numDaysTV.setText(Integer.toString(data.numDaysInUSA));
+	}
+
+    private void readDaysFromFile() {
         int i, j;
-        int dayCount = 0;
+        data.numDaysInUSA = 0;
         boolean fileExists = true;
         try {
-            fis = openFileInput(FILENAME);
+            fis = openFileInput(FILENAME_DAYS);
         } catch (FileNotFoundException e) {
             fileExists = false;
-            for(boolean[] row : inUSA) {
-                Arrays.fill(row,  false);
+            for(boolean[] row : data.inUSA) {
+                Arrays.fill(row, false);
             }
             e.printStackTrace();
         }
@@ -160,26 +190,25 @@ public class MainActivity extends ActionBarActivity {
                 for(j=0; j<31; j++) { // For each day of the month
                     if(inputBytes[i*31 + j] > 0) {
                         Log.d("MainActivity", "readDaysFromFile: inUSA=true for day: " + (i+1) + "/" + (j+1));
-                        inUSA[i][j] = true;
-                        dayCount++;
+                        data.inUSA[i][j] = true;
+                        data.numDaysInUSA++;
                     }
                     else {
-                        inUSA[i][j] = false;
+                        data.inUSA[i][j] = false;
                     }
                 }
             }
         }
-        return dayCount;
     }
 
-    // RETURNS: True if currently in USA, false otherwise
-    protected boolean readCountryFromFile() {
+     private void readCountryFromFile() {
         int numBytesRead = 0;
         try {
             fis = openFileInput(FILENAME_COUNTRY);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return false;
+            Log.d("MainActivity", "readCountryFromFile: FileNotFoundException, returning...");
+            return;
         }
 
         Log.d("MainActivity", "readCountryFromFile: File exists! Reading inputBytes...");
@@ -192,55 +221,68 @@ public class MainActivity extends ActionBarActivity {
         }
         if(numBytesRead > 0) {
             if(inputBytes[0] == Country.USA.getValue()) {
-                Log.d("MainActivity", "readCountryFromFile: Country read as USA, returning true...");
-                return true;
+                Log.d("MainActivity", "readCountryFromFile: Country read as USA, setting currentCountry to USA...");
+                data.currentCountry = Country.USA;
             }
             else {
-                Log.d("MainActivity", "readCountryFromFile: Country read as not USA, returning false...");
-                return false;
+                Log.d("MainActivity", "readCountryFromFile: Country read as not USA, setting currentCountry to CANADA...");
+                data.currentCountry = Country.CANADA;
             }
         }
         else {
-            Log.d("MainActivity", "readCountryFromFile: numBytesRead=0, returning false...");
-            return false;
+            Log.d("MainActivity", "readCountryFromFile: numBytesRead=0, returning...");
         }
+     }
+
+    private void readTimestampFromFile() {
+        Log.d("MainActivity", "Entering readTimestampFromFile");
+        int numBytesRead = 0;
+        try {
+            fis = openFileInput(FILENAME_TIMESTAMP);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.d("MainActivity", "readTimestampFromFile: FileNotFoundException, returning...");
+            return;
+        }
+
+        Log.d("MainActivity", "readTimestampFromFile: File exists! Reading inputBytes...");
+        try {
+            numBytesRead = fis.read(inputBytes, 0, 2);
+            fis.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        if(numBytesRead > 1) {
+            data.monthOfLastUpdate = inputBytes[0];
+            data.dayOfLastUpdate = inputBytes[1];
+            Log.d("MainActivity", "readTimestampFromFile: monthOfLastUpdate="+data.monthOfLastUpdate+", dayOfLastUpdate="+data.dayOfLastUpdate);
+        }
+        else {
+            Log.d("MainActivity", "readTimestampFromFile: numBytesRead < 2, returning...");
+        }
+        Log.d("MainActivity", "Exiting readTimestampFromFile");
     }
 
-    protected void updateDayCount() {
-        Log.d("MainActivity", "Entering updateDayCount");
-		if(currentCountry == Country.USA) { // Set today to true
-            Log.d("MainActivity", "updateDayCount: Currently in USA");
-			inUSA[today.get(Calendar.MONTH)][today.get(Calendar.DAY_OF_MONTH) - 1] = true;
-            Log.d("MainActivity", "updateDayCount: Setting entry of inUSA to true: [" + today.get(Calendar.MONTH) + "][" + (today.get(Calendar.DAY_OF_MONTH) - 1) + "]");
-		}
+    private void writeDaysToFile() {
         int i, j;
-		int index = 0;
-		numDaysInUSA = 0;
-		for(i=0; i<12; i++) {
-			for(j=0; j<31; j++) {
-				outputBytes[index++] = (byte) (inUSA[i][j] ? 1 : 0);
-				if(inUSA[i][j]) numDaysInUSA++; // Add day if required
-			}
-		}
-        Log.d("MainActivity", "updateDayCount: calling writeDaysToFile method, numDaysInUSA=" + numDaysInUSA);
-        writeDaysToFile();
-        Log.d("MainActivity", "updateDayCount: calling writeCountryToFile method, currentCountry=" + currentCountry);
-        writeCountryToFile();
-
-        Log.d("MainActivity", "Exiting updateDayCount: numDaysInUSA=" + numDaysInUSA);
-		numDaysTV.setText(Integer.toString(numDaysInUSA));
-	}
-
-    protected void writeDaysToFile() {
+        int index = 0;
+        data.numDaysInUSA = 0;
+        for(i=0; i<12; i++) {
+            for(j=0; j<31; j++) {
+                outputBytes[index++] = (byte) (data.inUSA[i][j] ? 1 : 0);
+                if(data.inUSA[i][j]) data.numDaysInUSA++; // Add day if required
+            }
+        }
         try {
-            Log.d("MainActivity", "writeDaysToFile: Opening file: " + FILENAME);
-            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            Log.d("MainActivity", "writeDaysToFile: Opening file: " + FILENAME_DAYS);
+            fos = openFileOutput(FILENAME_DAYS, Context.MODE_PRIVATE);
         } catch (FileNotFoundException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
         try {
-            Log.d("MainActivity", "writeDaysToFile: Writing outputBytes to file: " + FILENAME);
+            Log.d("MainActivity", "writeDaysToFile: Writing outputBytes to file: " + FILENAME_DAYS);
             fos.write(outputBytes);
             fos.close();
         } catch (IOException e) {
@@ -259,7 +301,27 @@ public class MainActivity extends ActionBarActivity {
         }
         try {
             Log.d("MainActivity", "writeCountryToFile: Writing currentCountry to file: " + FILENAME_COUNTRY);
-            fos.write(currentCountry.getValue());
+            fos.write(data.currentCountry.getValue());
+            fos.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private void writeTimestampToFile() {
+        twoOutputBytes[0] = (byte) today.get(Calendar.MONTH);
+        twoOutputBytes[1] = (byte) today.get(Calendar.DAY_OF_MONTH);
+        try {
+            Log.d("MainActivity", "writeTimestampToFile: Opening file: " + FILENAME_TIMESTAMP);
+            fos = openFileOutput(FILENAME_TIMESTAMP, Context.MODE_PRIVATE);
+        } catch (FileNotFoundException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        try {
+            Log.d("MainActivity", "writeTimestampToFile: Writing outputBytes to file: " + FILENAME_TIMESTAMP);
+            fos.write(twoOutputBytes);
             fos.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block

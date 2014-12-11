@@ -11,6 +11,7 @@
     <uses-permission
         android:name="android.permission.ACCESS_FINE_LOCATION"
         android:maxSdkVersion="21" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:debuggable="true"
@@ -28,12 +29,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ViewCalendar"
-            android:label="@string/title_activity_calendar" >
-        </activity>
-        <activity
             android:name=".CalendarView"
-            android:label="@string/title_activity_calendar_view" >
+            android:label="@string/title_activity_calendar" >
         </activity>
     </application>
 
