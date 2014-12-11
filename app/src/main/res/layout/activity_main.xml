@@ -68,6 +68,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="34dp"
         android:onClick="viewCalendar"
-        android:text="@string/view_calendar_button" />
+        android:text="@string/view_calendar_button"
+        android:clickable="false"
+        android:visibility="invisible" />
 
 </RelativeLayout>
