@@ -62,6 +62,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_calendar_view);
 
         Log.d("CalendarView", "Entering onCreate");
 		
@@ -72,8 +73,6 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 
         daysInUSATV = (TextView) findViewById(R.id.daysInUSATextView);
 		daysOfSelectedMonthInUSA = new boolean[31];
-		
-		setContentView(R.layout.activity_calendar_view);
 		
 		addItemSelectedListenerToSpinner();
 		// updateDaysInUSAList();
@@ -109,10 +108,11 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 			daysToDisplay = "None";
 		}
         Log.d("CalendarView", "updateDaysInUSAList: daysToDisplay=" + daysToDisplay);
-		daysInUSATV.setText((CharSequence)daysToDisplay);
+		daysInUSATV.setText(daysToDisplay);
         Log.d("CalendarView", "Exiting updateDaysInUSAList");
 	}
 	*/
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

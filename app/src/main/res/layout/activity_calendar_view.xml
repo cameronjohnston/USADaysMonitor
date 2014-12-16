@@ -30,10 +30,11 @@
         android:id="@+id/daysInUSAMessageTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/selectMonthSpinner"
-        android:layout_centerHorizontal="true"
         android:text="@string/days_in_usa"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:id="@+id/daysInUSATextView"

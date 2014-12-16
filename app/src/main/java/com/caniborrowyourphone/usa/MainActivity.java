@@ -85,8 +85,8 @@ public class MainActivity extends ActionBarActivity {
 
         updateLocationDisplay();
 
-        ar = new AlarmReceiver();
-        setDailyAlarm(this.getApplicationContext());
+        // ar = new AlarmReceiver();
+        // setDailyAlarm(this.getApplicationContext());
 
         Log.d("MainActivity", "Exiting onResume");
     }
@@ -447,6 +447,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void writeCountryToFile() {
+        if(data.currentCountry != Country.USA) {
+            data.currentCountry = Country.CANADA;
+        }
         try {
             Log.d("MainActivity", "writeCountryToFile: Opening file: " + FILENAME_COUNTRY);
             fos = openFileOutput(FILENAME_COUNTRY, Context.MODE_PRIVATE);

@@ -16,6 +16,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_calendar_view">Calendar</string>
     <string name="months_prompt">Select a month...</string>
+
     <string-array name="months">
         <item>January</item>
         <item>February</item>
@@ -30,8 +31,10 @@
         <item>November</item>
         <item>December</item>
     </string-array>
+
     <string name="select_month">Select Month:</string>
-	<string name="days_in_usa">Days you were in the USA for month selected:</string>
-	<string name="none">None!</string>
-	
+    <string name="days_in_usa">Days you were in the USA for month selected:</string>
+    <string name="none">None!</string>
+    <string name="title_activity_months_view">Days in USA</string>
+
 </resources>

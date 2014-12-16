@@ -929,6 +929,7 @@ containing a value of this type.
         public static final int calendar=0x7f0d0000;
         public static final int calendar_view=0x7f0d0001;
         public static final int main=0x7f0d0002;
+        public static final int menu_months_view=0x7f0d0003;
     }
     public static final class string {
         public static final int abc_action_bar_home_description=0x7f0b0000;
@@ -960,8 +961,9 @@ containing a value of this type.
         public static final int select_month=0x7f0b001a;
         public static final int title_activity_calendar=0x7f0b001b;
         public static final int title_activity_calendar_view=0x7f0b001c;
-        public static final int usa=0x7f0b001d;
-        public static final int view_calendar_button=0x7f0b001e;
+        public static final int title_activity_months_view=0x7f0b001d;
+        public static final int usa=0x7f0b001e;
+        public static final int view_calendar_button=0x7f0b001f;
     }
     public static final class style {
         /** 
