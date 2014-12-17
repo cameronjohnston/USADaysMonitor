@@ -698,10 +698,27 @@ containing a value of this type.
         public static final int abc_split_action_bar_is_narrow=0x7f060005;
     }
     public static final class color {
-        public static final int abc_search_url_text_holo=0x7f070003;
+        public static final int abc_search_url_text_holo=0x7f070014;
         public static final int abc_search_url_text_normal=0x7f070000;
         public static final int abc_search_url_text_pressed=0x7f070001;
         public static final int abc_search_url_text_selected=0x7f070002;
+        public static final int black=0x7f070003;
+        public static final int blue=0x7f070004;
+        public static final int dark=0x7f070005;
+        public static final int darkorrange=0x7f070006;
+        public static final int gray=0x7f070007;
+        public static final int journal_entry_listitem_text_color=0x7f070008;
+        public static final int lightgray=0x7f070009;
+        public static final int lightgray02=0x7f07000a;
+        public static final int lightgreen=0x7f07000b;
+        public static final int navy=0x7f07000c;
+        public static final int note_text_disabled=0x7f07000d;
+        public static final int orrange=0x7f07000e;
+        public static final int reaction_color_selected=0x7f07000f;
+        public static final int sky=0x7f070010;
+        public static final int static_text_color=0x7f070011;
+        public static final int symptom_color_selected=0x7f070012;
+        public static final int white=0x7f070013;
     }
     public static final class dimen {
         public static final int abc_action_bar_default_height=0x7f080000;
@@ -818,6 +835,8 @@ containing a value of this type.
         public static final int abc_textfield_searchview_right_holo_dark=0x7f020055;
         public static final int abc_textfield_searchview_right_holo_light=0x7f020056;
         public static final int ic_launcher=0x7f020057;
+        public static final int leftarrow64=0x7f020058;
+        public static final int rightarrow64=0x7f020059;
     }
     public static final class id {
         public static final int action_bar=0x7f09001c;
@@ -831,26 +850,26 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f090001;
         public static final int action_menu_presenter=0x7f090002;
         public static final int action_mode_close_button=0x7f090024;
-        public static final int action_settings=0x7f090047;
+        public static final int action_settings=0x7f090048;
         public static final int activity_chooser_view_content=0x7f090025;
         public static final int always=0x7f090013;
         public static final int beginning=0x7f09000f;
         public static final int checkbox=0x7f09002d;
         public static final int collapseActionView=0x7f090014;
-        public static final int currentlyInTextView=0x7f090044;
-        public static final int daysInUSAMessageTextView=0x7f09003e;
-        public static final int daysInUSATextView=0x7f09003f;
+        public static final int currentlyInTextView=0x7f090045;
+        public static final int daysInUSAMessageTextView=0x7f09003d;
+        public static final int daysInUSATextView=0x7f09003e;
         public static final int default_activity_button=0x7f090028;
         public static final int dialog=0x7f090018;
         public static final int disableHome=0x7f090009;
         public static final int dropdown=0x7f090019;
         public static final int edit_query=0x7f090030;
         public static final int end=0x7f090010;
-        public static final int enteringCanadaButton=0x7f090042;
-        public static final int enteringUSAButton=0x7f090043;
+        public static final int enteringCanadaButton=0x7f090043;
+        public static final int enteringUSAButton=0x7f090044;
         public static final int expand_activities_button=0x7f090026;
         public static final int expanded_menu=0x7f09002c;
-        public static final int headerTextView=0x7f090040;
+        public static final int headerTextView=0x7f090041;
         public static final int home=0x7f090003;
         public static final int homeAsUp=0x7f09000a;
         public static final int icon=0x7f09002a;
@@ -858,12 +877,14 @@ containing a value of this type.
         public static final int image=0x7f090027;
         public static final int listMode=0x7f090006;
         public static final int list_item=0x7f090029;
-        public static final int locationTextView=0x7f090045;
+        public static final int locationTextView=0x7f090046;
         public static final int middle=0x7f090011;
         public static final int never=0x7f090016;
+        public static final int nextMonthButton=0x7f090040;
         public static final int none=0x7f090012;
         public static final int normal=0x7f090007;
-        public static final int numDaysTextView=0x7f090041;
+        public static final int numDaysTextView=0x7f090042;
+        public static final int prevMonthButton=0x7f09003f;
         public static final int progress_circular=0x7f090004;
         public static final int progress_horizontal=0x7f090005;
         public static final int radio=0x7f09002f;
@@ -877,8 +898,7 @@ containing a value of this type.
         public static final int search_plate=0x7f090036;
         public static final int search_src_text=0x7f090037;
         public static final int search_voice_btn=0x7f09003b;
-        public static final int selectMonthSpinner=0x7f09003d;
-        public static final int selectMonthTextView=0x7f09003c;
+        public static final int selectMonthSpinner=0x7f09003c;
         public static final int shortcut=0x7f09002e;
         public static final int showCustom=0x7f09000b;
         public static final int showHome=0x7f09000c;
@@ -890,7 +910,7 @@ containing a value of this type.
         public static final int top_action_bar=0x7f090020;
         public static final int up=0x7f090021;
         public static final int useLogo=0x7f09000e;
-        public static final int viewCalendarButton=0x7f090046;
+        public static final int viewCalendarButton=0x7f090047;
         public static final int withText=0x7f090017;
     }
     public static final class integer {

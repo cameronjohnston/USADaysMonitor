@@ -8,23 +8,14 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.caniborrowyourphone.usa.CalendarView" >
 
-    <TextView
-        android:id="@+id/selectMonthTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/select_month"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
     <Spinner
         android:id="@+id/selectMonthSpinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/selectMonthTextView"
-        android:layout_centerHorizontal="true"
         android:prompt="@string/months_prompt"
-        android:entries="@array/months"/>
+        android:transitionGroup="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/daysInUSAMessageTextView"
@@ -42,6 +33,24 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/daysInUSAMessageTextView"
         android:layout_centerHorizontal="true"
-        android:text="@string/none" />
+        android:text="@string/none"
+        android:textSize="30dp" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/prevMonthButton"
+        android:layout_alignTop="@+id/selectMonthSpinner"
+        android:layout_toLeftOf="@+id/selectMonthSpinner"
+        android:background="@drawable/leftarrow64"
+        android:layout_alignBottom="@+id/selectMonthSpinner" />
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/nextMonthButton"
+        android:background="@drawable/rightarrow64"
+        android:layout_alignTop="@+id/selectMonthSpinner"
+        android:layout_toRightOf="@+id/selectMonthSpinner"
+        android:layout_alignBottom="@+id/selectMonthSpinner" />
 
 </RelativeLayout>

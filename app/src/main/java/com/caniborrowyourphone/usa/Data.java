@@ -8,23 +8,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Calendar;
 
 /**
  * Created by Cameron on 12/10/2014.
  */
 public class Data extends MainActivity {
 
-    protected Country currentCountry;
-    protected boolean[][] inUSA;
-    protected byte monthOfLastUpdate, dayOfLastUpdate;
-    protected int numDaysInUSA;
+    protected static Country currentCountry;
+    protected static boolean[][] inUSA;
+    protected static byte monthOfLastUpdate, dayOfLastUpdate;
+    protected static int numDaysInUSA;
+    protected static Calendar today;
 
-    public Data() {
-
-        inUSA = new boolean[12][31];
-        numDaysInUSA = 0;
-
-        monthOfLastUpdate = 0x0; // Should always be between 0-11 inclusive
-        dayOfLastUpdate = 0x0; // Should always be between 0-30 inclusive
-    }
 }
