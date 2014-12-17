@@ -18,19 +18,23 @@ import java.util.Calendar;
 
 public class CalendarView extends ActionBarActivity implements OnItemSelectedListener {
 
+    private static String tag = "CalendarView";
+    
     boolean daysOfSelectedMonthInUSA[];
-    int selectedMonth;
+    int selectedMonth, dayOfWeek, resID;
     ImageButton prevMonthButton, nextMonthButton;
     Spinner selectMonthSpinner;
-    String daysToDisplay;
-    TextView daysInUSATV;
+    Button[][] dayButtons;
+    Button thisDayButton;
+    String daysToDisplay, nameOfThisDayButton;
+    TextView yearTextView;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar_view);
 
-        Log.d("CalendarView", "Entering onCreate");
+        Log.d(tag, "Entering onCreate");
 
         prevMonthButton = (ImageButton) findViewById(R.id.prevMonthButton);
         nextMonthButton = (ImageButton) findViewById(R.id.nextMonthButton);
@@ -42,13 +46,13 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
         selectMonthSpinner.setAdapter(adapter);
         addItemSelectedListenerToSpinner();
         selectMonthSpinner.setSelection(Data.today.get(Calendar.MONTH));
+        yearTextView = (TextView) findViewById(R.id.yearTextView);
 
-        daysInUSATV = (TextView) findViewById(R.id.daysInUSATextView);
+        updateCalendarDisplay();
+
 		daysOfSelectedMonthInUSA = new boolean[31];
 
-		updateDaysInUSAList();
-
-        Log.d("CalendarView", "Exiting onCreate");
+        Log.d(tag, "Exiting onCreate");
 	}
 
     private void setButtonOnClickListeners() {
@@ -77,13 +81,88 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
         });
     }
 
+    private void updateCalendarDisplay() {
+        int dayOfMonth = 0;
+        boolean thisWeekVisible = true;
+        dayButtons = new Button[6][7];
+        Calendar c = Calendar.getInstance();
+        // Set c to the first day of the selected month
+        if(Data.today.get(Calendar.MONTH) < selectMonthSpinner.getSelectedItemPosition())
+            c.set(Data.today.get(Calendar.YEAR) - 1, selectMonthSpinner.getSelectedItemPosition(), 1);
+        else
+            c.set(Data.today.get(Calendar.YEAR), selectMonthSpinner.getSelectedItemPosition(), 1);
+        Log.d(tag, "updateCalendarDisplay: c="+c.get(Calendar.DAY_OF_WEEK)+" "+c.get(Calendar.DAY_OF_MONTH)+"/"+(c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR));
+
+        yearTextView.setText(String.valueOf(c.get(Calendar.YEAR)));
+        dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
+        // if(dayOfWeek == 7) dayOfWeek = 0;
+        for(int i=0; i<6; i++) {
+            for(int j=0; j<7; j++) {
+                Log.d(tag, "updateCalendarDisplay: Start of inner for loop, i="+i+", j="+j);
+                switch(j) {
+                    case 0:
+                        nameOfThisDayButton = "sunButton" + (i+1); break;
+                    case 1:
+                        nameOfThisDayButton = "monButton" + (i+1); break;
+                    case 2:
+                        nameOfThisDayButton = "tueButton" + (i+1); break;
+                    case 3:
+                        nameOfThisDayButton = "wedButton" + (i+1); break;
+                    case 4:
+                        nameOfThisDayButton = "thuButton" + (i+1); break;
+                    case 5:
+                        nameOfThisDayButton = "friButton" + (i+1); break;
+                    case 6:
+                        nameOfThisDayButton = "satButton" + (i+1); break;
+                    default:
+                        nameOfThisDayButton = "sunButton1"; break;
+                }
+                resID = getResources().getIdentifier(nameOfThisDayButton, "id", getPackageName());
+                Log.d(tag, "updateCalendarDisplay: nameOfThisDayButton="+nameOfThisDayButton+", resID ="+resID);
+                thisDayButton = (Button) findViewById(resID);
+                if(i==0 && j < (dayOfWeek-1)) { // not yet in month
+                    Log.d(tag, "updateCalendarDisplay: not yet in month");
+                    thisDayButton.setBackgroundColor(getResources().getColor(R.color.white));
+                    thisDayButton.setText("");
+                }
+                else if(++dayOfMonth <= getNumDaysInMonth(c.get(Calendar.MONTH))) { // in month
+                    Log.d(tag, "updateCalendarDisplay: Setting "+thisDayButton.getId()+" text to "+String.valueOf(dayOfMonth));
+                    thisDayButton.setVisibility(View.VISIBLE);
+                    thisDayButton.setText(String.valueOf(dayOfMonth));
+                    if(Data.inUSA[c.get(Calendar.MONTH)][dayOfMonth - 1]) {
+                        Log.d(tag, "updateCalendarDisplay: Setting blue background on "+thisDayButton.getId()+" for day in USA: "+(c.get(Calendar.MONTH)+1)+"/"+dayOfMonth);
+                        //thisDayButton.setBackgroundColor(getResources().getColor(R.color.sky));
+                        thisDayButton.setBackgroundResource(R.drawable.usaflag64x64);
+                    }
+                    else {
+                        thisDayButton.setBackgroundColor(getResources().getColor(R.color.white));
+                    }
+                }
+                else { // past month
+                    Log.d(tag, "updateCalendarDisplay: past month");
+                    thisDayButton.setText("");
+                    if(j==0) {
+                        thisWeekVisible = false;
+                        thisDayButton.setVisibility(View.INVISIBLE);
+                    }
+                    if(thisWeekVisible) {
+                        thisDayButton.setBackgroundColor(getResources().getColor(R.color.white));
+                    }
+                    else {
+                        thisDayButton.setVisibility(View.INVISIBLE);
+                    }
+                }
+            }
+        }
+    }
+
     public void onItemSelected(AdapterView<?> parent, View view,
                                int position, long id) {
-        Log.d("CalendarView", "Entering onItemSelected");
+        Log.d(tag, "Entering onItemSelected");
         selectMonthSpinner.setSelection(position);
-        Log.d("CalendarView", "onItemSelected: position of selected month="+position);
+        Log.d(tag, "onItemSelected: position of selected month="+position);
         selectedMonth = position;
-        updateDaysInUSAList();
+        updateCalendarDisplay();
     }
 
     @Override
@@ -92,24 +171,25 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
     }
 	
 	private void addItemSelectedListenerToSpinner() {
-        Log.d("CalendarView", "Entering addItemSelectedListenerToSpinner");
+        Log.d(tag, "Entering addItemSelectedListenerToSpinner");
 		selectMonthSpinner.setOnItemSelectedListener(this);
-        Log.d("CalendarView", "Exiting addItemSelectedListenerToSpinner");
+        Log.d(tag, "Exiting addItemSelectedListenerToSpinner");
 	}
 
+    /*
     private void updateDaysInUSAList() {
-        Log.d("CalendarView", "Entering updateDaysInUSAList, selectedMonth="+selectedMonth);
+        Log.d(tag, "Entering updateDaysInUSAList, selectedMonth="+selectedMonth);
 		boolean firstDay = true;
 		daysToDisplay = "";
 		for(int i=0; i<31; i++) {
 			if(Data.inUSA[selectedMonth][i]) {
 				if(firstDay) {
-                    Log.d("CalendarView", "updateDaysInUSAList: Adding first day to list:" + (i+1));
+                    Log.d(tag, "updateDaysInUSAList: Adding first day to list:" + (i+1));
 					daysToDisplay+= Integer.toString(i+1) + getEnding(i+1);
 					firstDay = false;
 				}
 				else {
-                    Log.d("CalendarView", "updateDaysInUSAList: Adding day to list:" + (i+1));
+                    Log.d(tag, "updateDaysInUSAList: Adding day to list:" + (i+1));
                     daysToDisplay += ", " + Integer.toString(i + 1) + getEnding(i+1);
                 }
 			}
@@ -117,10 +197,12 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 		if(firstDay) { // No days in USA
 			daysToDisplay = "None";
 		}
-        Log.d("CalendarView", "updateDaysInUSAList: daysToDisplay=" + daysToDisplay);
+        Log.d(tag, "updateDaysInUSAList: daysToDisplay=" + daysToDisplay);
 		daysInUSATV.setText(daysToDisplay);
-        Log.d("CalendarView", "Exiting updateDaysInUSAList");
+
+        Log.d(tag, "Exiting updateDaysInUSAList");
 	}
+	*/
 
     private String getEnding(int n) {
         switch(n) {
@@ -131,6 +213,38 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
             case 3:case 23:
                 return "rd";
             default: return "th";
+        }
+    }
+
+    private int getNumDaysInMonth(int month) {
+        switch(month) {
+            case 0:
+                return 31;
+            case 1:
+                if(Data.today.get(Calendar.YEAR) % 4 == 0) return 29;
+                else return 28;
+            case 2:
+                return 31;
+            case 3:
+                return 30;
+            case 4:
+                return 31;
+            case 5:
+                return 30;
+            case 6:
+                return 31;
+            case 7:
+                return 31;
+            case 8:
+                return 30;
+            case 9:
+                return 31;
+            case 10:
+                return 30;
+            case 11:
+                return 31;
+            default:
+                return 31;
         }
     }
 

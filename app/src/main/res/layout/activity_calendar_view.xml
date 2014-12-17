@@ -13,28 +13,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:prompt="@string/months_prompt"
-        android:transitionGroup="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
-
-    <TextView
-        android:id="@+id/daysInUSAMessageTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/days_in_usa"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:id="@+id/daysInUSATextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/daysInUSAMessageTextView"
-        android:layout_centerHorizontal="true"
-        android:text="@string/none"
-        android:textSize="30dp" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -50,7 +30,329 @@
         android:id="@+id/nextMonthButton"
         android:background="@drawable/rightarrow64"
         android:layout_alignTop="@+id/selectMonthSpinner"
-        android:layout_toRightOf="@+id/selectMonthSpinner"
+        android:layout_toRightOf="@+id/yearTextView"
         android:layout_alignBottom="@+id/selectMonthSpinner" />
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/selectMonthSpinner"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true">
+
+        <TableRow>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/sunButton"
+                android:text="@string/Sun"
+                android:textSize="20sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/monButton"
+                android:text="@string/Mon"
+                android:textSize="20sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/tueButton"
+                android:text="@string/Tue"
+                android:textSize="20sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/wedButton"
+                android:text="@string/Wed"
+                android:textSize="20sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/thuButton"
+                android:text="@string/Thu"
+                android:textSize="20sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/friButton"
+                android:text="@string/Fri"
+                android:textSize="20sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/satButton"
+                android:text="@string/Sat"
+                android:textSize="20sp"/>
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/sunButton1"
+                android:text="@string/Sun"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/monButton1"
+                android:text="@string/Mon"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/tueButton1"
+                android:text="@string/Tue"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/wedButton1"
+                android:text="@string/Wed"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/thuButton1"
+                android:text="@string/Thu"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/friButton1"
+                android:text="@string/Fri"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/satButton1"
+                android:text="@string/Sat"
+                android:textSize="15sp"/>
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/sunButton2"
+                android:text="@string/Sun"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/monButton2"
+                android:text="@string/Mon"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/tueButton2"
+                android:text="@string/Tue"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/wedButton2"
+                android:text="@string/Wed"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/thuButton2"
+                android:text="@string/Thu"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/friButton2"
+                android:text="@string/Fri"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/satButton2"
+                android:text="@string/Sat"
+                android:textSize="15sp"/>
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/sunButton3"
+                android:text="@string/Sun"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/monButton3"
+                android:text="@string/Mon"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/tueButton3"
+                android:text="@string/Tue"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/wedButton3"
+                android:text="@string/Wed"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/thuButton3"
+                android:text="@string/Thu"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/friButton3"
+                android:text="@string/Fri"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/satButton3"
+                android:text="@string/Sat"
+                android:textSize="15sp"/>
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/sunButton4"
+                android:text="@string/Sun"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/monButton4"
+                android:text="@string/Mon"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/tueButton4"
+                android:text="@string/Tue"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/wedButton4"
+                android:text="@string/Wed"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/thuButton4"
+                android:text="@string/Thu"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/friButton4"
+                android:text="@string/Fri"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/satButton4"
+                android:text="@string/Sat"
+                android:textSize="15sp"/>
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/sunButton5"
+                android:text="@string/Sun"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/monButton5"
+                android:text="@string/Mon"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/tueButton5"
+                android:text="@string/Tue"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/wedButton5"
+                android:text="@string/Wed"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/thuButton5"
+                android:text="@string/Thu"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/friButton5"
+                android:text="@string/Fri"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/satButton5"
+                android:text="@string/Sat"
+                android:textSize="15sp"/>
+        </TableRow>
+
+        <TableRow>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/sunButton6"
+                android:text="@string/Sun"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/monButton6"
+                android:text="@string/Mon"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/tueButton6"
+                android:text="@string/Tue"
+                android:textSize="15sp"
+                android:layout_width="wrap_content" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/wedButton6"
+                android:text="@string/Wed"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/thuButton6"
+                android:text="@string/Thu"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/friButton6"
+                android:text="@string/Fri"
+                android:textSize="15sp"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/satButton6"
+                android:text="@string/Sat"
+                android:textSize="15sp"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+        </TableRow>
+
+    </TableLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:id="@+id/yearTextView"
+        android:layout_alignTop="@+id/selectMonthSpinner"
+        android:layout_toRightOf="@+id/selectMonthSpinner"
+        android:layout_toEndOf="@id/selectMonthSpinner" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true">
+
+
+
+        </LinearLayout>
+
 
 </RelativeLayout>

@@ -69,7 +69,6 @@
         android:layout_marginTop="34dp"
         android:onClick="viewCalendar"
         android:text="@string/view_calendar_button"
-        android:clickable="true"
-        android:visibility="visible" />
+        android:clickable="true" />
 
 </RelativeLayout>

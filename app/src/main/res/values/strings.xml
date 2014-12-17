@@ -16,6 +16,13 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_calendar_view">Calendar</string>
     <string name="months_prompt">Select a month...</string>
+    <string name="Mon">M</string>
+    <string name="Tue">T</string>
+    <string name="Wed">W</string>
+    <string name="Thu">T</string>
+    <string name="Fri">F</string>
+    <string name="Sat">S</string>
+    <string name="Sun">S</string>
 
     <string-array name="months">
         <item>January</item>
