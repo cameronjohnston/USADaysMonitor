@@ -25,24 +25,6 @@
         android:text="@string/num_days_text_view"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
-        android:id="@+id/enteringCanadaButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/headerTextView"
-        android:layout_below="@+id/numDaysTextView"
-        android:layout_marginTop="40dp"
-        android:layout_toLeftOf="@+id/numDaysTextView"
-        android:text="@string/entering_canada" />
-
-    <Button
-        android:id="@+id/enteringUSAButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/enteringCanadaButton"
-        android:layout_toRightOf="@+id/numDaysTextView"
-        android:text="@string/entering_usa" />
-
     <TextView
         android:id="@+id/currentlyInTextView"
         android:layout_width="wrap_content"
@@ -58,7 +40,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/currentlyInTextView"
         android:layout_centerHorizontal="true"
-        android:text="@string/no_mans_land" />
+        android:text="@string/no_mans_land"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
         android:id="@+id/viewCalendarButton"
@@ -70,5 +53,32 @@
         android:onClick="viewCalendar"
         android:text="@string/view_calendar_button"
         android:clickable="true" />
+
+    <LinearLayout
+        android:id="@+id/mainLinearLayout"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/numDaysTextView"
+        android:layout_marginTop="40dp"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/enteringCanadaButton"
+            android:layout_width="144dp"
+            android:layout_height="72dp"
+            android:text="@string/entering_canada"
+            android:scaleType="centerInside"
+            android:layout_marginRight="10dp" />
+
+        <Button
+            android:id="@+id/enteringUSAButton"
+            android:layout_width="144dp"
+            android:layout_height="72dp"
+            android:text="@string/entering_usa"
+            android:scaleType="centerInside"
+            android:layout_marginLeft="10dp" />
+
+        </LinearLayout>
 
 </RelativeLayout>

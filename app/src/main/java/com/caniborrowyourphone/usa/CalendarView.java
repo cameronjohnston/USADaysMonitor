@@ -19,15 +19,14 @@ import java.util.Calendar;
 public class CalendarView extends ActionBarActivity implements OnItemSelectedListener {
 
     private static String tag = "CalendarView";
-    
-    boolean daysOfSelectedMonthInUSA[];
+
     int selectedMonth, dayOfWeek, resID;
     ImageButton prevMonthButton, nextMonthButton;
     Spinner selectMonthSpinner;
     Button[][] dayButtons;
     Button thisDayButton;
-    String daysToDisplay, nameOfThisDayButton;
-    TextView yearTextView;
+    String nameOfThisDayButton;
+    TextView yearTextView, numDaysThisMonthTV;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +46,9 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
         addItemSelectedListenerToSpinner();
         selectMonthSpinner.setSelection(Data.today.get(Calendar.MONTH));
         yearTextView = (TextView) findViewById(R.id.yearTextView);
+        numDaysThisMonthTV = (TextView) findViewById(R.id.numDaysThisMonthTextView);
 
         updateCalendarDisplay();
-
-		daysOfSelectedMonthInUSA = new boolean[31];
 
         Log.d(tag, "Exiting onCreate");
 	}
@@ -83,6 +81,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 
     private void updateCalendarDisplay() {
         int dayOfMonth = 0;
+        int numDaysThisMonth = 0;
         boolean thisWeekVisible = true;
         dayButtons = new Button[6][7];
         Calendar c = Calendar.getInstance();
@@ -95,7 +94,6 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 
         yearTextView.setText(String.valueOf(c.get(Calendar.YEAR)));
         dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-        // if(dayOfWeek == 7) dayOfWeek = 0;
         for(int i=0; i<6; i++) {
             for(int j=0; j<7; j++) {
                 Log.d(tag, "updateCalendarDisplay: Start of inner for loop, i="+i+", j="+j);
@@ -131,7 +129,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
                     thisDayButton.setText(String.valueOf(dayOfMonth));
                     if(Data.inUSA[c.get(Calendar.MONTH)][dayOfMonth - 1]) {
                         Log.d(tag, "updateCalendarDisplay: Setting blue background on "+thisDayButton.getId()+" for day in USA: "+(c.get(Calendar.MONTH)+1)+"/"+dayOfMonth);
-                        //thisDayButton.setBackgroundColor(getResources().getColor(R.color.sky));
+                        numDaysThisMonth++;
                         thisDayButton.setBackgroundResource(R.drawable.usaflag64x64);
                     }
                     else {
@@ -142,18 +140,23 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
                     Log.d(tag, "updateCalendarDisplay: past month");
                     thisDayButton.setText("");
                     if(j==0) {
+                        Log.d(tag, "updateCalendarDisplay: past month, j=0. Setting INVISIBLE");
                         thisWeekVisible = false;
                         thisDayButton.setVisibility(View.INVISIBLE);
                     }
                     if(thisWeekVisible) {
+                        Log.d(tag, "updateCalendarDisplay: past month, setting VISIBLE with white background");
+                        thisDayButton.setVisibility(View.VISIBLE);
                         thisDayButton.setBackgroundColor(getResources().getColor(R.color.white));
                     }
                     else {
+                        Log.d(tag, "updateCalendarDisplay: past month, thisWeekVisible=false. Setting INVISIBLE");
                         thisDayButton.setVisibility(View.INVISIBLE);
                     }
                 }
             }
         }
+        numDaysThisMonthTV.setText(String.valueOf(numDaysThisMonth) + " days of selected month in the USA");
     }
 
     public void onItemSelected(AdapterView<?> parent, View view,

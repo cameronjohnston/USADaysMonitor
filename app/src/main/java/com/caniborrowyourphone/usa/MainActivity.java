@@ -53,6 +53,9 @@ public class MainActivity extends ActionBarActivity {
 
         enteringCanadaButton = (Button) findViewById(R.id.enteringCanadaButton);
         enteringUSAButton = (Button) findViewById(R.id.enteringUSAButton);
+        enteringCanadaButton.setBackgroundResource(R.drawable.canadaflag2000x1000);
+        enteringUSAButton.setBackgroundResource(R.drawable.usaflag800x421_revisedblue2);
+
         setButtonOnClickListeners();
 
         locationTV = (TextView) findViewById(R.id.locationTextView);

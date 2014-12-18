@@ -8,74 +8,57 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.caniborrowyourphone.usa.CalendarView" >
 
-    <Spinner
-        android:id="@+id/selectMonthSpinner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:prompt="@string/months_prompt"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/prevMonthButton"
-        android:layout_alignTop="@+id/selectMonthSpinner"
-        android:layout_toLeftOf="@+id/selectMonthSpinner"
-        android:background="@drawable/leftarrow64"
-        android:layout_alignBottom="@+id/selectMonthSpinner" />
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/nextMonthButton"
-        android:background="@drawable/rightarrow64"
-        android:layout_alignTop="@+id/selectMonthSpinner"
-        android:layout_toRightOf="@+id/yearTextView"
-        android:layout_alignBottom="@+id/selectMonthSpinner" />
-
     <TableLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@+id/selectMonthSpinner"
+        android:layout_below="@+id/calendarLinearLayout"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="false">
 
         <TableRow>
             <Button
                 android:layout_weight="1"
                 android:id="@+id/sunButton"
+                android:clickable="false"
                 android:text="@string/Sun"
                 android:textSize="20sp"/>
             <Button
                 android:layout_weight="1"
                 android:id="@+id/monButton"
+                android:clickable="false"
                 android:text="@string/Mon"
                 android:textSize="20sp"/>
             <Button
                 android:layout_weight="1"
                 android:id="@+id/tueButton"
+                android:clickable="false"
                 android:text="@string/Tue"
                 android:textSize="20sp"/>
             <Button
                 android:layout_weight="1"
                 android:id="@+id/wedButton"
+                android:clickable="false"
                 android:text="@string/Wed"
                 android:textSize="20sp"/>
             <Button
                 android:layout_weight="1"
                 android:id="@+id/thuButton"
+                android:clickable="false"
                 android:text="@string/Thu"
                 android:textSize="20sp"/>
             <Button
                 android:layout_weight="1"
                 android:id="@+id/friButton"
+                android:clickable="false"
                 android:text="@string/Fri"
                 android:textSize="20sp"/>
             <Button
                 android:layout_weight="1"
                 android:id="@+id/satButton"
+                android:clickable="false"
                 android:text="@string/Sat"
                 android:textSize="20sp"/>
         </TableRow>
@@ -326,33 +309,53 @@
                 android:textSize="15sp"/>
         </TableRow>
 
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent">
-
-        </TableRow>
-
     </TableLayout>
+
+
+
+    <LinearLayout
+        android:id="@+id/calendarLinearLayout"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/prevMonthButton"
+            android:background="@drawable/leftarrow64" />
+
+        <Spinner
+            android:id="@+id/selectMonthSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:prompt="@string/months_prompt" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/yearTextView" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/nextMonthButton"
+            android:background="@drawable/rightarrow64" />
+
+        </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/yearTextView"
-        android:layout_alignTop="@+id/selectMonthSpinner"
-        android:layout_toRightOf="@+id/selectMonthSpinner"
-        android:layout_toEndOf="@id/selectMonthSpinner" />
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true">
-
-
-
-        </LinearLayout>
+        android:text="New Text"
+        android:id="@+id/numDaysThisMonthTextView"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:textSize="15sp" />
 
 
 </RelativeLayout>
