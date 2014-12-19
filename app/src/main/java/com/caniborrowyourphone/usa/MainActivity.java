@@ -36,11 +36,6 @@ public class MainActivity extends ActionBarActivity {
 	TextView locationTV, numDaysTV;
 	LocationManager locationManager;
 
-    private AlarmReceiver ar;
-	AlarmManager alarmMgr;
-	Intent alarmIntent;
-	PendingIntent alarmPendingIntent;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -107,6 +102,7 @@ public class MainActivity extends ActionBarActivity {
 			@Override
 			public void onClick(View v) {
 				Data.currentCountry = Country.CANADA;
+                Data.today = Calendar.getInstance();
 				updateDayCount();
 				updateLocationDisplay();
 			}
@@ -118,6 +114,7 @@ public class MainActivity extends ActionBarActivity {
 			@Override
 			public void onClick(View v) {
 				Data.currentCountry = Country.USA;
+                Data.today = Calendar.getInstance();
 				updateDayCount();
 				updateLocationDisplay();
 			}

@@ -1,5 +1,7 @@
 package com.caniborrowyourphone.usa;
 
+import android.app.ActionBar;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,6 +16,8 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.text.DateFormatSymbols;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class CalendarView extends ActionBarActivity implements OnItemSelectedListener {
@@ -21,12 +25,13 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
     private static String tag = "CalendarView";
 
     int selectedMonth, dayOfWeek, resID;
-    ImageButton prevMonthButton, nextMonthButton;
+    ActionBar actionBar;
+    ImageButton prevMonthButton, nextMonthButton, calendarBackButton;
     Spinner selectMonthSpinner;
     Button[][] dayButtons;
     Button thisDayButton;
     String nameOfThisDayButton;
-    TextView yearTextView, numDaysThisMonthTV;
+    TextView numDaysThisMonthTV, calendarBackTV;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,23 +40,60 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 
         Log.d(tag, "Entering onCreate");
 
+        actionBar = getActionBar();
+
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.actionbar);
+
         prevMonthButton = (ImageButton) findViewById(R.id.prevMonthButton);
         nextMonthButton = (ImageButton) findViewById(R.id.nextMonthButton);
-        setButtonOnClickListeners();
+        calendarBackButton = (ImageButton) findViewById(R.id.calendarBackButton);
 		
 		selectMonthSpinner = (Spinner) findViewById(R.id.selectMonthSpinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.months, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        selectMonthSpinner.setAdapter(adapter);
-        addItemSelectedListenerToSpinner();
-        selectMonthSpinner.setSelection(Data.today.get(Calendar.MONTH));
-        yearTextView = (TextView) findViewById(R.id.yearTextView);
+        // yearTextView = (TextView) findViewById(R.id.yearTextView);
         numDaysThisMonthTV = (TextView) findViewById(R.id.numDaysThisMonthTextView);
+        calendarBackTV = (TextView) findViewById(R.id.calendarBackTextView);
 
-        updateCalendarDisplay();
+        initializeSpinner();
+
+        setButtonOnClickListeners();
+
+        addItemSelectedListenerToSpinner();
+
+        updateCalendarDisplay(false);
 
         Log.d(tag, "Exiting onCreate");
 	}
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        prevMonthButton.setVisibility(selectMonthSpinner.getSelectedItemPosition() == 0 ? View.INVISIBLE : View.VISIBLE);
+        nextMonthButton.setVisibility(selectMonthSpinner.getSelectedItemPosition() == 12 ? View.INVISIBLE : View.VISIBLE);
+    }
+
+    private void initializeSpinner() {
+        int month, year;
+        String entry = "";
+        // ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.empty, android.R.layout.simple_spinner_item);
+        // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>());
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        selectMonthSpinner.setAdapter(dataAdapter);
+        year = Data.today.get(Calendar.YEAR) - 1;
+        for(month=Data.today.get(Calendar.MONTH); month<12; month++) {
+            entry = new DateFormatSymbols().getMonths()[month] + " " + year;
+            Log.d(tag, "initializeSpinner: Adding entry "+entry);
+            dataAdapter.add(entry);
+        }
+        year++;
+        for(month=0; month<=Data.today.get(Calendar.MONTH); month++) {
+            entry = new DateFormatSymbols().getMonths()[month] + " " + year;
+            Log.d(tag, "initializeSpinner: Adding entry "+entry);
+            dataAdapter.add(entry);
+        }
+        selectMonthSpinner.setSelection(12);
+    }
 
     private void setButtonOnClickListeners() {
         prevMonthButton.setOnClickListener(new View.OnClickListener() {
@@ -59,7 +101,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
             @Override
             public void onClick(View v) {
                 if (selectMonthSpinner.getSelectedItemPosition() == 0)
-                    selectMonthSpinner.setSelection(11);
+                    selectMonthSpinner.setSelection(12);
                 else
                     selectMonthSpinner.setSelection(selectMonthSpinner.getSelectedItemPosition() - 1);
             }
@@ -70,29 +112,50 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 
             @Override
             public void onClick(View v) {
-                if(selectMonthSpinner.getSelectedItemPosition() == 11)
+                if(selectMonthSpinner.getSelectedItemPosition() == 12)
                     selectMonthSpinner.setSelection(0);
                 else
                     selectMonthSpinner.setSelection(selectMonthSpinner.getSelectedItemPosition() + 1);
             }
 
         });
+        calendarBackButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivityForResult(myIntent, 0);
+            }
+
+        });
+        calendarBackTV.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivityForResult(myIntent, 0);
+            }
+
+        });
+
     }
 
-    private void updateCalendarDisplay() {
+    private void updateCalendarDisplay(boolean prevYearFlag) {
         int dayOfMonth = 0;
         int numDaysThisMonth = 0;
         boolean thisWeekVisible = true;
+        boolean sameMonthAsToday, dayAfterToday, doNotDisplay;
         dayButtons = new Button[6][7];
         Calendar c = Calendar.getInstance();
         // Set c to the first day of the selected month
-        if(Data.today.get(Calendar.MONTH) < selectMonthSpinner.getSelectedItemPosition())
-            c.set(Data.today.get(Calendar.YEAR) - 1, selectMonthSpinner.getSelectedItemPosition(), 1);
+        if((Data.today.get(Calendar.MONTH) < selectedMonth) || prevYearFlag)
+            c.set(Data.today.get(Calendar.YEAR) - 1, selectedMonth, 1);
         else
-            c.set(Data.today.get(Calendar.YEAR), selectMonthSpinner.getSelectedItemPosition(), 1);
+            c.set(Data.today.get(Calendar.YEAR), selectedMonth, 1);
         Log.d(tag, "updateCalendarDisplay: c="+c.get(Calendar.DAY_OF_WEEK)+" "+c.get(Calendar.DAY_OF_MONTH)+"/"+(c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR));
+        sameMonthAsToday = (c.get(Calendar.MONTH) == Data.today.get(Calendar.MONTH) ? true : false);
 
-        yearTextView.setText(String.valueOf(c.get(Calendar.YEAR)));
+        // yearTextView.setText(String.valueOf(c.get(Calendar.YEAR)));
         dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
         for(int i=0; i<6; i++) {
             for(int j=0; j<7; j++) {
@@ -125,10 +188,12 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
                 }
                 else if(++dayOfMonth <= getNumDaysInMonth(c.get(Calendar.MONTH))) { // in month
                     Log.d(tag, "updateCalendarDisplay: Setting "+thisDayButton.getId()+" text to "+String.valueOf(dayOfMonth));
+                    dayAfterToday = dayOfMonth > Data.today.get(Calendar.DAY_OF_MONTH);
+                    doNotDisplay = (sameMonthAsToday && (prevYearFlag != dayAfterToday));
                     thisDayButton.setVisibility(View.VISIBLE);
                     thisDayButton.setText(String.valueOf(dayOfMonth));
-                    if(Data.inUSA[c.get(Calendar.MONTH)][dayOfMonth - 1]) {
-                        Log.d(tag, "updateCalendarDisplay: Setting blue background on "+thisDayButton.getId()+" for day in USA: "+(c.get(Calendar.MONTH)+1)+"/"+dayOfMonth);
+                    if((Data.inUSA[c.get(Calendar.MONTH)][dayOfMonth - 1]) && doNotDisplay == false) {
+                        Log.d(tag, "updateCalendarDisplay: Changing background for day in USA: "+(c.get(Calendar.MONTH)+1)+"/"+dayOfMonth);
                         numDaysThisMonth++;
                         thisDayButton.setBackgroundResource(R.drawable.usaflag64x64);
                     }
@@ -156,16 +221,19 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
                 }
             }
         }
-        numDaysThisMonthTV.setText(String.valueOf(numDaysThisMonth) + " days of selected month in the USA");
+        numDaysThisMonthTV.setText(String.valueOf(numDaysThisMonth));
     }
 
     public void onItemSelected(AdapterView<?> parent, View view,
                                int position, long id) {
         Log.d(tag, "Entering onItemSelected");
+        boolean prevYearFlag = (position==0 ? true : false);
         selectMonthSpinner.setSelection(position);
-        Log.d(tag, "onItemSelected: position of selected month="+position);
-        selectedMonth = position;
-        updateCalendarDisplay();
+        selectedMonth = (position + Data.today.get(Calendar.MONTH)) % 12;
+        Log.d(tag, "onItemSelected: position of selected month="+position+", selectedMonth="+selectedMonth);
+        prevMonthButton.setVisibility(selectMonthSpinner.getSelectedItemPosition() == 0 ? View.INVISIBLE : View.VISIBLE);
+        nextMonthButton.setVisibility(selectMonthSpinner.getSelectedItemPosition() == 12 ? View.INVISIBLE : View.VISIBLE);
+        updateCalendarDisplay(prevYearFlag);
     }
 
     @Override
@@ -263,10 +331,8 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+        Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivityForResult(myIntent, 0);
+        return true;
 	}
 }

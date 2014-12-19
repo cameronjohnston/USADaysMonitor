@@ -5,7 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="entering_canada">Entering CAN</string>
     <string name="entering_usa">Entering USA</string>
-    <string name="header_text_view">Number of days in the USA in the past 12 months:</string>
+    <string name="header_text_view">Days in the USA during the past 12 months:</string>
     <string name="num_days_text_view">0</string>
     <string name="currently_in">Currently in:</string>
     <string name="canada">Canada</string>
@@ -23,6 +23,9 @@
     <string name="Fri">F</string>
     <string name="Sat">S</string>
     <string name="Sun">S</string>
+    <string name="back">Back</string>
+    <string name="calendar">Calendar</string>
+    <string name="num_days_selected_month_text_view">Days in the USA during selected month:</string>
 
     <string-array name="months">
         <item>January</item>
@@ -38,9 +41,11 @@
         <item>November</item>
         <item>December</item>
     </string-array>
+    <string-array name="empty">
+    </string-array>
 
     <string name="select_month">Select Month:</string>
-    <string name="days_in_usa">Days you were in the USA for month selected:</string>
+    <string name="days_in_usa">Days in the USA for month selected:</string>
     <string name="none">None!</string>
     <string name="title_activity_months_view">Days in USA</string>
 

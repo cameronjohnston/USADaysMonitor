@@ -23,7 +23,7 @@
         android:layout_below="@+id/headerTextView"
         android:layout_centerHorizontal="true"
         android:text="@string/num_days_text_view"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textSize="30sp" />
 
     <TextView
         android:id="@+id/currentlyInTextView"
