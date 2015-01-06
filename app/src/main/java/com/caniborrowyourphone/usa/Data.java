@@ -6,22 +6,23 @@ import java.util.Calendar;
  * Class for sharing static data between all activities of USA Days Monitor app
  * Created by Cameron Johnston on 12/10/2014.
  */
-public class Data extends MainActivity {
+public class Data {
+    private static final String tag = "Data";
 
-    protected static final boolean USING_DUMMY_LOCATION_SERVICES = false;
+    static final boolean USING_DUMMY_LOCATION_SERVICES = false;
 
-    protected static final int NUM_BYTES_FOR_STORING_DAYS = 12*31;
-    protected static final String FILENAME_DAYS = "usa_days_records.txt";
-    protected static final String FILENAME_COUNTRY = "current_country.txt";
-    protected static final String FILENAME_TIMESTAMP = "timestamp.txt";
+    static final int NUM_BYTES_FOR_STORING_DAYS = 12*31;
+    static final String FILENAME_DAYS = "usa_days_records.txt";
+    static final String FILENAME_COUNTRY = "current_country.txt";
+    static final String FILENAME_TIMESTAMP = "timestamp.txt";
+    static final String FILENAME_USERNAME = "username.txt";
 
-    protected static Country currentCountry;
-    protected static boolean[][] inUSA;
-    protected static byte monthOfLastUpdate, dayOfLastUpdate;
-    protected static int numDaysInUSA;
-    protected static Calendar today;
+    static Country currentCountry;
+    static boolean[][] inUSA;
+    static byte monthOfLastUpdate, dayOfLastUpdate;
+    static int numDaysInUSA;
+    static Calendar today;
 
-    protected static boolean usingCloudStorage;
-    protected static boolean creatingAccount;
-    protected static String username;
+    static boolean usingCloudStorage;
+    static String username;
 }

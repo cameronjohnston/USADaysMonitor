@@ -1,25 +1,21 @@
 package com.caniborrowyourphone.usa;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -42,10 +38,11 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
     private static String tag = "SettingsActivity";
     final static Handler handler = new Handler();
     Dialog dialog;
+    InputMethodManager imm;
 
-    TextView accountTV, cloudStorageTV;
+    TextView accountTV, loggedInAsTV;
     Button loginButton, createAccountButton, logoutButton;
-    ToggleButton cloudStorageToggleButton;
+    Switch cloudStorageSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,17 +52,18 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         setContentView(R.layout.activity_settings);
 
         accountTV = (TextView) findViewById(R.id.accountTextView);
-        cloudStorageTV = (TextView) findViewById(R.id.cloudStorageTextView);
+        loggedInAsTV = (TextView) findViewById(R.id.loggedInAsTextView);
         loginButton = (Button) findViewById(R.id.loginButton);
         createAccountButton = (Button) findViewById(R.id.createAccountButton);
         logoutButton = (Button) findViewById(R.id.logoutButton);
-        cloudStorageToggleButton = (ToggleButton) findViewById(R.id.cloudStorageToggleButton);
+        cloudStorageSwitch = (Switch) findViewById(R.id.usingCloudStorageSwitch);
 
         createAccountButton.setOnClickListener(this);
         loginButton.setOnClickListener(this);
         logoutButton.setOnClickListener(this);
-        cloudStorageToggleButton.setOnClickListener(this);
-        setButtonOnClickListeners();
+        cloudStorageSwitch.setOnClickListener(this);
+
+        imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
         Log.d(tag, "Exiting onCreate");
     }
@@ -74,65 +72,6 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
     protected void onResume() {
         super.onResume();
         updateSettingsDisplay();
-    }
-
-    private void setButtonOnClickListeners() {
-        /*
-        createAccountButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "createAccountButton pressed.");
-                createAccount();
-            }
-        });
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "Login button pressed.");
-                // Create Object of Dialog class
-                final Dialog login = new Dialog(this);
-                loginDialog = new Dialog(this);
-                // Set GUI of login screen
-                loginDialog.setContentView(R.layout.dialog_login);
-                loginDialog.setTitle("Login to USA Days Monitor");
-                Button loginDialogButton = (Button) findViewById(R.id.loginDialogButton);
-                Button cancelDialogButton = (Button) findViewById(R.id.cancelDialogButton);
-                final EditText usernameDialogET = (EditText)loginDialog.findViewById(R.id.usernameDialogEditText);
-                final EditText passwordDialogET = (EditText)loginDialog.findViewById(R.id.passwordDialogEditText);
-                // Attached listener for login GUI button
-                loginDialogButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        new LoginTask(usernameDialogET.getText().toString(), passwordDialogET.getText().toString()).execute();
-                    }
-                });
-                cancelDialogButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        loginDialog.dismiss();
-                    }
-                });
-                loginDialog.show();
-                Log.d(tag, "Exiting login. LoginDialog should have just started.");
-            }
-        });
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "Logout button pressed.");
-                Toast.makeText(SettingsActivity.this, "Logout successful.", Toast.LENGTH_LONG).show();
-                Data.username = "";
-                updateSettingsDisplay();
-            }
-        });
-        cloudStorageToggleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(tag, "toggleCloudStorage: usingCloudStorage="+cloudStorageToggleButton.isChecked());
-                Data.usingCloudStorage = cloudStorageToggleButton.isChecked();
-            }
-        });
-        */
     }
 
     @Override
@@ -149,9 +88,9 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
             Data.username = "";
             updateSettingsDisplay();
         }
-        else if(v == cloudStorageToggleButton) {
-            Log.d(tag, "toggleCloudStorage: usingCloudStorage="+cloudStorageToggleButton.isChecked());
-            Data.usingCloudStorage = cloudStorageToggleButton.isChecked();
+        else if(v == cloudStorageSwitch) {
+            Log.d(tag, "toggleCloudStorage: usingCloudStorage="+cloudStorageSwitch.isChecked());
+            Data.usingCloudStorage = cloudStorageSwitch.isChecked();
         }
     }
 
@@ -161,8 +100,19 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         loginButton.setVisibility(Data.username.equals("") ? View.VISIBLE : View.INVISIBLE);
         createAccountButton.setVisibility(Data.username.equals("") ? View.VISIBLE : View.INVISIBLE);
         logoutButton.setVisibility(Data.username.equals("") ? View.INVISIBLE : View.VISIBLE);
-        cloudStorageTV.setVisibility(Data.username.equals("") ? View.INVISIBLE : View.VISIBLE);
-        cloudStorageToggleButton.setVisibility(Data.username.equals("") ? View.INVISIBLE : View.VISIBLE);
+        cloudStorageSwitch.setVisibility(Data.username.equals("") ? View.INVISIBLE : View.VISIBLE);
+
+        updateUserDisplay();
+    }
+
+    private void updateUserDisplay() {
+        if(Data.username.equals("")) {
+            loggedInAsTV.setVisibility(View.INVISIBLE);
+        }
+        else {
+            loggedInAsTV.setText("Logged in as "+Data.username);
+            loggedInAsTV.setVisibility(View.VISIBLE);
+        }
     }
 
     private void createAccount() {
@@ -184,6 +134,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         createAccountDialogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                imm.hideSoftInputFromWindow(retypeDialogET.getWindowToken(), 0);
                 new DBQueryTask(usernameDialogET.getText().toString(), passwordDialogET.getText().toString(),
                         retypeDialogET.getText().toString(), Query.CREATE_ACCOUNT).execute();
             }
@@ -213,6 +164,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         loginDialogButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                imm.hideSoftInputFromWindow(passwordDialogET.getWindowToken(), 0);
                 new DBQueryTask(usernameDialogET.getText().toString(), passwordDialogET.getText().toString(), Query.LOGIN).execute();
             }
         });

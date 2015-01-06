@@ -11,6 +11,7 @@
     <color name="blue">#0000FF</color>
     <color name="navy">#6699FF</color>
     <color name="sky">#0099CC</color>
+    <color name="usaflagrevisedblue">#007AC4</color>
     <color name="gray">#808080</color>
     <color name="lightgray">#e7e7e7</color>
     <color name="lightgray02">#bfbfbf</color>
@@ -18,6 +19,8 @@
     <color name="lightgreen">#336666</color>
     <color name="orrange">#e33d1b</color>
     <color name="darkorrange">#cc2303</color>
+    <color name="red">#ff0000</color>
+    <color name="usaflagred">#bb133e</color>
     <color name="limegreen">#07c700</color>
 
 </resources>

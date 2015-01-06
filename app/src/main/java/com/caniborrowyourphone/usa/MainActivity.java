@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity {
     private FileOutputStream fos;
 
     Button enteringCanadaButton, enteringUSAButton;
-	TextView locationTV, numDaysTV;
+	TextView locationTV, numDaysTV, loggedInAsTV;
 	LocationManager locationManager;
     LocationListener locationListener;
     Location currentLocation;
@@ -53,15 +53,13 @@ public class MainActivity extends ActionBarActivity {
 
         Log.d(tag, "Entering onCreate");
 
-        Data.username = "";
-
         setContentView(R.layout.activity_main);
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         enteringCanadaButton = (Button) findViewById(R.id.enteringCanadaButton);
         enteringUSAButton = (Button) findViewById(R.id.enteringUSAButton);
-        enteringCanadaButton.setBackgroundResource(R.drawable.canadaflag2000x1000);
+        enteringCanadaButton.setBackgroundResource(R.drawable.canadaflag2000x1000_usaflagred);
         enteringUSAButton.setBackgroundResource(R.drawable.usaflag800x421_revisedblue2);
 
         setButtonOnClickListeners();
@@ -69,6 +67,7 @@ public class MainActivity extends ActionBarActivity {
 
         locationTV = (TextView) findViewById(R.id.locationTextView);
         numDaysTV = (TextView) findViewById(R.id.numDaysTextView);
+        loggedInAsTV = (TextView) findViewById(R.id.loggedInAsTextView);
 
         Log.d(tag, "Exiting onCreate");
     }
@@ -87,9 +86,11 @@ public class MainActivity extends ActionBarActivity {
         outputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
         twoOutputBytes = new byte[2];
 
+        if(Data.username != null) writeUsernameToFile();
         initializeDayCount();
         updateDayCount();
         updateLocationDisplay();
+        updateUserDisplay();
 
         Log.d(tag, "Exiting onResume");
     }
@@ -179,10 +180,11 @@ public class MainActivity extends ActionBarActivity {
 	}
 	
 	private void initializeDayCount() {
-        Log.d(tag, "Entering initializeDayCount, calling readDaysFromFile and readCountryFromFile methods");
+        Log.d(tag, "Entering initializeDayCount, calling read methods");
 		readDaysFromFile();
         readCountryFromFile();
         readTimestampFromFile();
+        readUsernameFromFile();
         updateDaysSinceTimestamp();
         Log.d(tag, "Exiting initializeDayCount. numDaysInUSA=" + Data.numDaysInUSA);
 	}
@@ -205,6 +207,15 @@ public class MainActivity extends ActionBarActivity {
 		numDaysTV.setText(Integer.toString(Data.numDaysInUSA));
 	}
 
+    private void updateUserDisplay() {
+        if(Data.username.equals("")) {
+            loggedInAsTV.setVisibility(View.INVISIBLE);
+        }
+        else {
+            loggedInAsTV.setText("Logged in as "+Data.username);
+            loggedInAsTV.setVisibility(View.VISIBLE);
+        }
+    }
     /**
      * Updates whether the user was in the USA for each day from the last update to today
      * Covers all cases, including the last update being from a previous month or year or today
@@ -467,6 +478,32 @@ public class MainActivity extends ActionBarActivity {
         Log.d(tag, "Exiting readTimestampFromFile");
     }
 
+    private void readUsernameFromFile() {
+        Log.d(tag, "Entering readUsernameFromFile");
+        String temp = "";
+        int c;
+        try {
+            fis = openFileInput(Data.FILENAME_USERNAME);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.d(tag, "readUsernameFromFile: FileNotFoundException, returning...");
+            return;
+        }
+
+        Log.d(tag, "readUsernameFromFile: File exists! Reading inputBytes...");
+        try {
+            while( (c = fis.read()) != -1){
+                temp += Character.toString((char)c);
+            }
+            fis.close();
+        } catch (IOException e) {
+            Log.e(tag, "readUsernameFromFile: IOException when trying to read from FileInputStream");
+            e.printStackTrace();
+        }
+        Data.username = temp;
+        Log.d(tag, "Exiting readUsernameFromFile, username="+temp);
+    }
+
     private void writeDaysToFile() {
         int i, j;
         int index = 0;
@@ -531,6 +568,24 @@ public class MainActivity extends ActionBarActivity {
             fos.close();
         } catch (IOException e) {
             Log.e(tag, "writeTimestampToFile: IOException when trying to write to FileOutputStream");
+            e.printStackTrace();
+        }
+    }
+
+    private void writeUsernameToFile() {
+        try {
+            Log.d(tag, "writeUsernameToFile: Opening file: " + Data.FILENAME_USERNAME);
+            fos = openFileOutput(Data.FILENAME_USERNAME, Context.MODE_PRIVATE);
+        } catch (FileNotFoundException e1) {
+            Log.e(tag, "writeUsernameToFile: FileNotFoundException");
+            e1.printStackTrace();
+        }
+        try {
+            Log.d(tag, "writeUsernameToFile: Writing username to file: " + Data.username);
+            if(Data.username != null) fos.write(Data.username.getBytes());
+            fos.close();
+        } catch (IOException e) {
+            Log.e(tag, "writeUsernameToFile: IOException when trying to write to FileOutputStream");
             e.printStackTrace();
         }
     }
@@ -659,16 +714,6 @@ public class MainActivity extends ActionBarActivity {
                 return "No address found";
             }
         }
-
-        /**
-         * A method that's called once doInBackground() completes.
-
-        @Override
-        protected void onPostExecute(String address) {
-            //Log.d(tag, "onPostExecute: countryFromLocation="+countryFromLocation);
-            //Data.currentCountry = (countryFromLocation == "United States" ? Country.USA : Country.CANADA);
-        }
-        */
     }
 
 }

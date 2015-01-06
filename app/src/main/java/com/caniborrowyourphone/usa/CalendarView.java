@@ -35,7 +35,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
     Button[][] dayButtons;
     Button thisDayButton;
     String nameOfThisDayButton;
-    TextView numDaysThisMonthTV, calendarBackTV;
+    TextView numDaysThisMonthTV, calendarBackTV, loggedInAsTV;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +54,9 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
         calendarBackButton = (ImageButton) findViewById(R.id.calendarBackButton);
 		
 		selectMonthSpinner = (Spinner) findViewById(R.id.selectMonthSpinner);
-        // yearTextView = (TextView) findViewById(R.id.yearTextView);
         numDaysThisMonthTV = (TextView) findViewById(R.id.numDaysThisMonthTextView);
         calendarBackTV = (TextView) findViewById(R.id.calendarBackTextView);
+        loggedInAsTV = (TextView) findViewById(R.id.loggedInAsTextView);
 
         initializeSpinner();
 
@@ -74,13 +74,12 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
         super.onResume();
         prevMonthButton.setVisibility(selectMonthSpinner.getSelectedItemPosition() == 0 ? View.INVISIBLE : View.VISIBLE);
         nextMonthButton.setVisibility(selectMonthSpinner.getSelectedItemPosition() == 12 ? View.INVISIBLE : View.VISIBLE);
+        updateUserDisplay();
     }
 
     private void initializeSpinner() {
         int month, year;
         String entry;
-        // ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.empty, android.R.layout.simple_spinner_item);
-        // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<String>());
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectMonthSpinner.setAdapter(dataAdapter);
@@ -229,6 +228,16 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
         numDaysThisMonthTV.setText(String.valueOf(numDaysThisMonth));
     }
 
+    private void updateUserDisplay() {
+        if(Data.username.equals("")) {
+            loggedInAsTV.setVisibility(View.INVISIBLE);
+        }
+        else {
+            loggedInAsTV.setText("Logged in as "+Data.username);
+            loggedInAsTV.setVisibility(View.VISIBLE);
+        }
+    }
+
     public void onItemSelected(AdapterView<?> parent, View view,
                                int position, long id) {
         Log.d(tag, "Entering onItemSelected");
@@ -242,55 +251,13 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
+    public void onNothingSelected(AdapterView<?> parent) {}
 	
 	private void addItemSelectedListenerToSpinner() {
         Log.d(tag, "Entering addItemSelectedListenerToSpinner");
 		selectMonthSpinner.setOnItemSelectedListener(this);
         Log.d(tag, "Exiting addItemSelectedListenerToSpinner");
 	}
-
-    /*
-    private void updateDaysInUSAList() {
-        Log.d(tag, "Entering updateDaysInUSAList, selectedMonth="+selectedMonth);
-		boolean firstDay = true;
-		daysToDisplay = "";
-		for(int i=0; i<31; i++) {
-			if(Data.inUSA[selectedMonth][i]) {
-				if(firstDay) {
-                    Log.d(tag, "updateDaysInUSAList: Adding first day to list:" + (i+1));
-					daysToDisplay+= Integer.toString(i+1) + getEnding(i+1);
-					firstDay = false;
-				}
-				else {
-                    Log.d(tag, "updateDaysInUSAList: Adding day to list:" + (i+1));
-                    daysToDisplay += ", " + Integer.toString(i + 1) + getEnding(i+1);
-                }
-			}
-		}
-		if(firstDay) { // No days in USA
-			daysToDisplay = "None";
-		}
-        Log.d(tag, "updateDaysInUSAList: daysToDisplay=" + daysToDisplay);
-		daysInUSATV.setText(daysToDisplay);
-
-        Log.d(tag, "Exiting updateDaysInUSAList");
-	}
-
-    private String getEnding(int n) {
-        switch(n) {
-            case 1: case 21: case 31:
-                return "st";
-            case 2:case 22:
-                return "nd";
-            case 3:case 23:
-                return "rd";
-            default: return "th";
-        }
-    }
-    */
 
     private int getNumDaysInMonth(int month) {
         switch(month) {

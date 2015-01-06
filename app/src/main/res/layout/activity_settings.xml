@@ -3,9 +3,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.caniborrowyourphone.usa.SettingsActivity" >
 
@@ -13,6 +10,8 @@
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
         android:layout_centerHorizontal="true"
         android:id="@+id/linearLayout1"
         android:gravity="fill_vertical">
@@ -53,7 +52,9 @@
             android:text="@string/login"
             android:id="@+id/loginButton"
             android:scaleType="centerInside"
-            android:layout_marginRight="10dp" />
+            android:layout_marginRight="10dp"
+            android:background="@color/usaflagred"
+            android:textColor="@color/white" />
 
         <Button
             android:layout_width="144dp"
@@ -61,7 +62,9 @@
             android:text="@string/create_account"
             android:id="@+id/createAccountButton"
             android:scaleType="centerInside"
-            android:layout_marginLeft="10dp" />
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/white"
+            android:background="@color/usaflagred" />
     </LinearLayout>
 
     <Button
@@ -72,46 +75,30 @@
         android:id="@+id/logoutButton"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:visibility="invisible" />
+        android:visibility="invisible"
+        android:background="@color/usaflagred"
+        android:textColor="@color/white" />
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
+    <Switch
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/linearLayout2"
-        android:gravity="fill_vertical|center_horizontal"
-        android:baselineAligned="false"
-        android:id="@+id/linearLayout3">
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="left"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="@string/use_cloud_storage"
-                android:id="@+id/cloudStorageTextView" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical">
-
-            <ToggleButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/cloudStorageToggleButton"
-                android:layout_marginLeft="10dp" />
-        </LinearLayout>
-    </LinearLayout>
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:text="@string/use_cloud_storage"
+        android:id="@+id/usingCloudStorageSwitch"
+        android:layout_centerHorizontal="true"
+        android:textSize="22sp"
+        android:checked="false"
+        android:layout_below="@+id/linearLayout2" />
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text=""
+        android:id="@+id/loggedInAsTextView"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/usaflagrevisedblue"
+        android:gravity="center" />
 
 </RelativeLayout>

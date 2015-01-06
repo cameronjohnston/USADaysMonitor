@@ -699,7 +699,7 @@ containing a value of this type.
         public static final int abc_split_action_bar_is_narrow=0x7f060005;
     }
     public static final class color {
-        public static final int abc_search_url_text_holo=0x7f070015;
+        public static final int abc_search_url_text_holo=0x7f070018;
         public static final int abc_search_url_text_normal=0x7f070000;
         public static final int abc_search_url_text_pressed=0x7f070001;
         public static final int abc_search_url_text_selected=0x7f070002;
@@ -717,10 +717,13 @@ containing a value of this type.
         public static final int note_text_disabled=0x7f07000e;
         public static final int orrange=0x7f07000f;
         public static final int reaction_color_selected=0x7f070010;
-        public static final int sky=0x7f070011;
-        public static final int static_text_color=0x7f070012;
-        public static final int symptom_color_selected=0x7f070013;
-        public static final int white=0x7f070014;
+        public static final int red=0x7f070011;
+        public static final int sky=0x7f070012;
+        public static final int static_text_color=0x7f070013;
+        public static final int symptom_color_selected=0x7f070014;
+        public static final int usaflagred=0x7f070015;
+        public static final int usaflagrevisedblue=0x7f070016;
+        public static final int white=0x7f070017;
     }
     public static final class dimen {
         public static final int abc_action_bar_default_height=0x7f080000;
@@ -837,15 +840,16 @@ containing a value of this type.
         public static final int abc_textfield_searchview_right_holo_dark=0x7f020055;
         public static final int abc_textfield_searchview_right_holo_light=0x7f020056;
         public static final int canadaflag2000x1000=0x7f020057;
-        public static final int ic_launcher=0x7f020058;
-        public static final int leftarrow64=0x7f020059;
-        public static final int leftarrow64_lightgrey1_transparent=0x7f02005a;
-        public static final int rightarrow64=0x7f02005b;
-        public static final int usaflag64x64_revisedblue2=0x7f02005c;
-        public static final int usaflag800x421_revisedblue2=0x7f02005d;
+        public static final int canadaflag2000x1000_usaflagred=0x7f020058;
+        public static final int ic_launcher=0x7f020059;
+        public static final int leftarrow64=0x7f02005a;
+        public static final int leftarrow64_lightgrey1_transparent=0x7f02005b;
+        public static final int rightarrow64=0x7f02005c;
+        public static final int usaflag64x64_revisedblue2=0x7f02005d;
+        public static final int usaflag800x421_revisedblue2=0x7f02005e;
     }
     public static final class id {
-        public static final int accountTextView=0x7f090092;
+        public static final int accountTextView=0x7f090084;
         public static final int action_bar=0x7f09001c;
         public static final int action_bar_activity_content=0x7f090000;
         public static final int action_bar_container=0x7f09001b;
@@ -857,7 +861,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f090001;
         public static final int action_menu_presenter=0x7f090002;
         public static final int action_mode_close_button=0x7f090024;
-        public static final int action_settings=0x7f0900a0;
+        public static final int action_settings=0x7f090090;
         public static final int activity_chooser_view_content=0x7f090025;
         public static final int always=0x7f090013;
         public static final int beginning=0x7f09000f;
@@ -866,24 +870,20 @@ containing a value of this type.
         public static final int calendarLinearLayout=0x7f09003f;
         public static final int calendarLinearLayout2=0x7f09003c;
         public static final int calendarTableLayout=0x7f090043;
-        public static final int cancelDialogButton=0x7f09009e;
+        public static final int cancelDialogButton=0x7f09008e;
         public static final int checkbox=0x7f09002d;
-        public static final int cloudStorageTextView=0x7f090098;
-        public static final int cloudStorageToggleButton=0x7f090099;
         public static final int collapseActionView=0x7f090014;
-        public static final int createAccountButton=0x7f090095;
-        public static final int createAccountButtonPopup=0x7f090083;
-        public static final int createAccountDialogButton=0x7f09009d;
-        public static final int currentlyInTextView=0x7f090088;
+        public static final int createAccountButton=0x7f090087;
+        public static final int createAccountDialogButton=0x7f09008d;
+        public static final int currentlyInTextView=0x7f09007a;
         public static final int default_activity_button=0x7f090028;
         public static final int dialog=0x7f090018;
         public static final int disableHome=0x7f090009;
-        public static final int doPasswordsMatchTextView=0x7f090082;
         public static final int dropdown=0x7f090019;
         public static final int edit_query=0x7f090030;
         public static final int end=0x7f090010;
-        public static final int enteringCanadaButton=0x7f09008b;
-        public static final int enteringUSAButton=0x7f09008c;
+        public static final int enteringCanadaButton=0x7f09007d;
+        public static final int enteringUSAButton=0x7f09007e;
         public static final int expand_activities_button=0x7f090026;
         public static final int expanded_menu=0x7f09002c;
         public static final int friButton=0x7f090049;
@@ -893,28 +893,23 @@ containing a value of this type.
         public static final int friButton4=0x7f090065;
         public static final int friButton5=0x7f09006c;
         public static final int friButton6=0x7f090073;
-        public static final int headerTextView=0x7f090086;
+        public static final int headerTextView=0x7f090078;
         public static final int home=0x7f090003;
         public static final int homeAsUp=0x7f09000a;
         public static final int icon=0x7f09002a;
         public static final int ifRoom=0x7f090015;
         public static final int image=0x7f090027;
-        public static final int isUsernameAvailableTextView=0x7f09007a;
-        public static final int linearLayout1=0x7f090090;
-        public static final int linearLayout2=0x7f090093;
-        public static final int linearLayout3=0x7f090097;
-        public static final int linearLayout4=0x7f090077;
-        public static final int linearLayout5=0x7f09007b;
-        public static final int linearLayout6=0x7f09007f;
+        public static final int linearLayout1=0x7f090082;
+        public static final int linearLayout2=0x7f090085;
         public static final int listMode=0x7f090006;
         public static final int list_item=0x7f090029;
-        public static final int locationTextView=0x7f090089;
-        public static final int loginButton=0x7f090094;
-        public static final int loginButton2=0x7f090085;
-        public static final int loginDialogButton=0x7f09009f;
-        public static final int logoutButton=0x7f090096;
-        public static final int main=0x7f09008f;
-        public static final int mainLinearLayout=0x7f09008a;
+        public static final int locationTextView=0x7f09007b;
+        public static final int loggedInAsTextView=0x7f090077;
+        public static final int loginButton=0x7f090086;
+        public static final int loginDialogButton=0x7f09008f;
+        public static final int logoutButton=0x7f090088;
+        public static final int main=0x7f090081;
+        public static final int mainLinearLayout=0x7f09007c;
         public static final int middle=0x7f090011;
         public static final int monButton=0x7f090045;
         public static final int monButton1=0x7f09004c;
@@ -927,18 +922,15 @@ containing a value of this type.
         public static final int nextMonthButton=0x7f090042;
         public static final int none=0x7f090012;
         public static final int normal=0x7f090007;
-        public static final int numDaysTextView=0x7f090087;
+        public static final int numDaysTextView=0x7f090079;
         public static final int numDaysThisMonthHeaderTextView=0x7f090075;
         public static final int numDaysThisMonthTextView=0x7f090076;
-        public static final int passwordDialogEditText=0x7f09009b;
-        public static final int passwordEditText=0x7f09007d;
+        public static final int passwordDialogEditText=0x7f09008b;
         public static final int prevMonthButton=0x7f090040;
         public static final int progress_circular=0x7f090004;
         public static final int progress_horizontal=0x7f090005;
         public static final int radio=0x7f09002f;
-        public static final int resultTextView=0x7f090084;
-        public static final int retypePasswordDialogEditText=0x7f09009c;
-        public static final int retypePasswordEditText=0x7f090081;
+        public static final int retypePasswordDialogEditText=0x7f09008c;
         public static final int satButton=0x7f09004a;
         public static final int satButton1=0x7f090051;
         public static final int satButton2=0x7f090058;
@@ -957,7 +949,7 @@ containing a value of this type.
         public static final int search_src_text=0x7f090037;
         public static final int search_voice_btn=0x7f09003b;
         public static final int selectMonthSpinner=0x7f090041;
-        public static final int settingsButton=0x7f09008d;
+        public static final int settingsButton=0x7f09007f;
         public static final int shortcut=0x7f09002e;
         public static final int showCustom=0x7f09000b;
         public static final int showHome=0x7f09000c;
@@ -972,11 +964,7 @@ containing a value of this type.
         public static final int sunButton5=0x7f090067;
         public static final int sunButton6=0x7f09006e;
         public static final int tabMode=0x7f090008;
-        public static final int textView=0x7f090091;
-        public static final int textView2=0x7f090078;
-        public static final int textView3=0x7f09007c;
-        public static final int textView4=0x7f090080;
-        public static final int textView5=0x7f09007e;
+        public static final int textView=0x7f090083;
         public static final int thuButton=0x7f090048;
         public static final int thuButton1=0x7f09004f;
         public static final int thuButton2=0x7f090056;
@@ -995,9 +983,9 @@ containing a value of this type.
         public static final int tueButton6=0x7f090070;
         public static final int up=0x7f090021;
         public static final int useLogo=0x7f09000e;
-        public static final int usernameDialogEditText=0x7f09009a;
-        public static final int usernameEditText=0x7f090079;
-        public static final int viewCalendarButton=0x7f09008e;
+        public static final int usernameDialogEditText=0x7f09008a;
+        public static final int usingCloudStorageSwitch=0x7f090089;
+        public static final int viewCalendarButton=0x7f090080;
         public static final int wedButton=0x7f090047;
         public static final int wedButton1=0x7f09004e;
         public static final int wedButton2=0x7f090055;
@@ -1037,22 +1025,18 @@ containing a value of this type.
         public static final int abc_simple_decor=0x7f030017;
         public static final int actionbar=0x7f030018;
         public static final int activity_calendar_view=0x7f030019;
-        public static final int activity_create_account=0x7f03001a;
-        public static final int activity_login=0x7f03001b;
-        public static final int activity_main=0x7f03001c;
-        public static final int activity_settings=0x7f03001d;
-        public static final int dialog_createaccount=0x7f03001e;
-        public static final int dialog_login=0x7f03001f;
-        public static final int support_simple_spinner_dropdown_item=0x7f030020;
+        public static final int activity_main=0x7f03001a;
+        public static final int activity_settings=0x7f03001b;
+        public static final int dialog_createaccount=0x7f03001c;
+        public static final int dialog_login=0x7f03001d;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001e;
     }
     public static final class menu {
         public static final int calendar=0x7f0d0000;
         public static final int calendar_view=0x7f0d0001;
         public static final int main=0x7f0d0002;
-        public static final int menu_create_account=0x7f0d0003;
-        public static final int menu_login=0x7f0d0004;
-        public static final int menu_months_view=0x7f0d0005;
-        public static final int menu_settings=0x7f0d0006;
+        public static final int menu_months_view=0x7f0d0003;
+        public static final int menu_settings=0x7f0d0004;
     }
     public static final class string {
         public static final int Fri=0x7f0b0000;
