@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -27,31 +28,32 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Class for launcher activity of USA Days Monitor app
+ * Created by Cameron Johnston on 12/1/2014
+ */
 public class MainActivity extends ActionBarActivity {
 
     private static final String tag = "MainActivity";
-    private static final boolean USING_DUMMY_LOCATION_SERVICES = true;
-
-    protected static final int NUM_BYTES_FOR_STORING_DAYS = 12*31;
-    protected static final String FILENAME_DAYS = "usa_days_records.txt";
-    protected static final String FILENAME_COUNTRY = "current_country.txt";
-    protected static final String FILENAME_TIMESTAMP = "timestamp.txt";
+    private final Handler handler = new Handler();
 
     private FileInputStream fis;
     private byte[] inputBytes, outputBytes, twoOutputBytes;
     private FileOutputStream fos;
-    private String countryFromLocation;
 
-	Button enteringCanadaButton, enteringUSAButton;
+    Button enteringCanadaButton, enteringUSAButton;
 	TextView locationTV, numDaysTV;
 	LocationManager locationManager;
     LocationListener locationListener;
+    Location currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Log.d(tag, "Entering onCreate");
+
+        Data.username = "";
 
         setContentView(R.layout.activity_main);
 
@@ -81,43 +83,22 @@ public class MainActivity extends ActionBarActivity {
 
         initializeData();
 
-        inputBytes = new byte[NUM_BYTES_FOR_STORING_DAYS];
-        outputBytes = new byte[NUM_BYTES_FOR_STORING_DAYS];
+        inputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
+        outputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
         twoOutputBytes = new byte[2];
 
         initializeDayCount();
-
         updateDayCount();
-
         updateLocationDisplay();
-
-        // ar = new AlarmReceiver();
-        // setDailyAlarm(this.getApplicationContext());
-
-        // Ensure that a Geocoder services is available
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
-            // Show the activity indicator
-            /*
-             * Reverse geocoding is long-running and synchronous.
-             * Run it on a background thread.
-             * Pass the current location to the background task.
-             * When the task finishes,
-             * onPostExecute() displays the address.
-             */
-            // (new GetAddressTask(getApplicationContext())).execute(createLocation("lsd", 34, -118, 3.0f));
-        }
 
         Log.d(tag, "Exiting onResume");
     }
 
     protected void initializeData() {
-
         Data.inUSA = new boolean[12][31];
         Data.numDaysInUSA = 0;
-
         Data.monthOfLastUpdate = 0x0; // Should always be between 0-11 inclusive
         Data.dayOfLastUpdate = 0x0; // Should always be between 0-30 inclusive
-
         Data.today = Calendar.getInstance(); // Initialize to current date
     }
 	
@@ -126,9 +107,9 @@ public class MainActivity extends ActionBarActivity {
 
 			@Override
 			public void onClick(View v) {
-                if(USING_DUMMY_LOCATION_SERVICES) {
+                if(Data.USING_DUMMY_LOCATION_SERVICES) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
-                        (new GetAddressTask(getApplicationContext())).execute(createLocation("lsd", 49.25, -123.1, 3.0f));
+                        (new GetAddressTask(getApplicationContext())).execute(createLocation("lsd", 49.25, -123.1, 3.0f)); // Vancouver, BC
                     }
                 }
                 else {
@@ -145,9 +126,9 @@ public class MainActivity extends ActionBarActivity {
 
 			@Override
 			public void onClick(View v) {
-                if(USING_DUMMY_LOCATION_SERVICES) {
+                if(Data.USING_DUMMY_LOCATION_SERVICES) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
-                        (new GetAddressTask(getApplicationContext())).execute(createLocation("lsd", 49, -123.0647, 3.0f));
+                        (new GetAddressTask(getApplicationContext())).execute(createLocation("lsd", 49, -123.0647, 3.0f)); // Point Roberts, Washington
                     }
                 }
                 else {
@@ -165,33 +146,17 @@ public class MainActivity extends ActionBarActivity {
         locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // Ensure that a Geocoder services is available
-                if (Build.VERSION.SDK_INT >=
-                        Build.VERSION_CODES.GINGERBREAD
-                        &&
-                        Geocoder.isPresent()) {
-                    // Show the activity indicator
-            /*
-             * Reverse geocoding is long-running and synchronous.
-             * Run it on a background thread.
-             * Pass the current location to the background task.
-             * When the task finishes,
-             * onPostExecute() displays the address.
-             */
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
+                    Log.d(tag, "onLocationChanged: Geocoder present, starting new GetAddressTask in background thread");
                     (new GetAddressTask(getApplicationContext())).execute(location);
                 }
             }
-
             @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
             @Override
-            public void onProviderEnabled(String provider) {
-            }
-
+            public void onProviderEnabled(String provider) {}
             @Override
-            public void onProviderDisabled(String provider) {
-            }
+            public void onProviderDisabled(String provider) {}
         };
     }
 
@@ -202,12 +167,6 @@ public class MainActivity extends ActionBarActivity {
         newLocation.setLongitude(lng);
         newLocation.setAccuracy(accuracy);
         return newLocation;
-    }
-
-    private void updateCountryFromLocation(Location loc) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
-            (new GetAddressTask(getApplicationContext())).execute(loc);
-        }
     }
 	
 	private void updateLocationDisplay() {
@@ -226,7 +185,6 @@ public class MainActivity extends ActionBarActivity {
         readTimestampFromFile();
         updateDaysSinceTimestamp();
         Log.d(tag, "Exiting initializeDayCount. numDaysInUSA=" + Data.numDaysInUSA);
-		// numDaysTV.setText(Integer.toString(Data.numDaysInUSA));
 	}
 
     private void updateDayCount() {
@@ -247,6 +205,10 @@ public class MainActivity extends ActionBarActivity {
 		numDaysTV.setText(Integer.toString(Data.numDaysInUSA));
 	}
 
+    /**
+     * Updates whether the user was in the USA for each day from the last update to today
+     * Covers all cases, including the last update being from a previous month or year or today
+     */
     private void updateDaysSinceTimestamp() {
         Log.d(tag, "Entering updateDaysSinceTimestamp");
         int i, j; // Using i to iterate through months, j to iterate through days
@@ -280,8 +242,8 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
 
-            // Now go through the days before today in the current month
-            for(j=0; j<Data.today.get(Calendar.DAY_OF_MONTH) - 1; j++) {
+            // Now go through the days up to and including today in the current month
+            for(j=0; j<Data.today.get(Calendar.DAY_OF_MONTH); j++) {
                 if(Data.currentCountry == Country.USA) {
                     Log.d(tag, "updateDaysSinceTimestamp: Setting inUSA["+Data.today.get(Calendar.MONTH)+"]["+j+"]=true");
                     Data.inUSA[Data.today.get(Calendar.MONTH)][j] = true;
@@ -338,8 +300,8 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
 
-            // Now go through the days before today in the current month
-            for(j=0; j<Data.today.get(Calendar.DAY_OF_MONTH) - 1; j++) {
+            // Now go through the days up to and including today in the current month
+            for(j=0; j<Data.today.get(Calendar.DAY_OF_MONTH); j++) {
                 if(Data.currentCountry == Country.USA) {
                     Log.d(tag, "updateDaysSinceTimestamp: Setting inUSA["+Data.today.get(Calendar.MONTH)+"]["+j+"]=true");
                     Data.inUSA[Data.today.get(Calendar.MONTH)][j] = true;
@@ -353,8 +315,8 @@ public class MainActivity extends ActionBarActivity {
 
         else { // monthOfLastUpdate must equal today's month
             Log.d(tag, "updateDaysSinceTimestamp: updated this month");
-            // Go through all days after dayOfLastUpdate and before today
-            for(j=(int)Data.dayOfLastUpdate + 1; j<Data.today.get(Calendar.DAY_OF_MONTH) - 1; j++) {
+            // Go through all days after dayOfLastUpdate up to and including today
+            for(j=(int)Data.dayOfLastUpdate + 1; j<Data.today.get(Calendar.DAY_OF_MONTH); j++) {
                 if(Data.currentCountry == Country.USA) {
                     Log.d(tag, "updateDaysSinceTimestamp: Setting inUSA["+Data.today.get(Calendar.MONTH)+"]["+j+"]=true");
                     Data.inUSA[Data.today.get(Calendar.MONTH)][j] = true;
@@ -402,11 +364,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void readDaysFromFile() {
-        int i, j;
+        int i, j, numBytesRead;
         Data.numDaysInUSA = 0;
         boolean fileExists = true;
         try {
-            fis = openFileInput(FILENAME_DAYS);
+            fis = openFileInput(Data.FILENAME_DAYS);
         } catch (FileNotFoundException e) {
             fileExists = false;
             for(boolean[] row : Data.inUSA) {
@@ -417,10 +379,14 @@ public class MainActivity extends ActionBarActivity {
         if(fileExists) {
             Log.d(tag, "readDaysFromFile: File exists! Reading inputBytes...");
             try {
-                fis.read(inputBytes);
+                numBytesRead = fis.read(inputBytes);
                 fis.close();
+                if(numBytesRead < Data.NUM_BYTES_FOR_STORING_DAYS) {
+                    Log.d(tag, "readDaysFromFile: Less bytes than expected read from file. Returning...");
+                    return;
+                }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                Log.e(tag, "IOException in readDaysFromFile when trying to read from FileInputStream");
                 e.printStackTrace();
             }
             for(i=0; i<12; i++) { // For each month
@@ -441,7 +407,7 @@ public class MainActivity extends ActionBarActivity {
      private void readCountryFromFile() {
         int numBytesRead = 0;
         try {
-            fis = openFileInput(FILENAME_COUNTRY);
+            fis = openFileInput(Data.FILENAME_COUNTRY);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Log.d(tag, "readCountryFromFile: FileNotFoundException, returning...");
@@ -453,7 +419,7 @@ public class MainActivity extends ActionBarActivity {
             numBytesRead = fis.read(inputBytes, 0, 1);
             fis.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            Log.e(tag, "readCountryFromFile: IOException when trying to read from FileInputStream");
             e.printStackTrace();
         }
         if(numBytesRead > 0) {
@@ -475,7 +441,7 @@ public class MainActivity extends ActionBarActivity {
         Log.d(tag, "Entering readTimestampFromFile");
         int numBytesRead = 0;
         try {
-            fis = openFileInput(FILENAME_TIMESTAMP);
+            fis = openFileInput(Data.FILENAME_TIMESTAMP);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Log.d(tag, "readTimestampFromFile: FileNotFoundException, returning...");
@@ -487,7 +453,7 @@ public class MainActivity extends ActionBarActivity {
             numBytesRead = fis.read(inputBytes, 0, 2);
             fis.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            Log.e(tag, "readTimestampFromFile: IOException when trying to read from FileInputStream");
             e.printStackTrace();
         }
         if(numBytesRead > 1) {
@@ -512,18 +478,18 @@ public class MainActivity extends ActionBarActivity {
             }
         }
         try {
-            Log.d(tag, "writeDaysToFile: Opening file: " + FILENAME_DAYS);
-            fos = openFileOutput(FILENAME_DAYS, Context.MODE_PRIVATE);
+            Log.d(tag, "writeDaysToFile: Opening file: " + Data.FILENAME_DAYS);
+            fos = openFileOutput(Data.FILENAME_DAYS, Context.MODE_PRIVATE);
         } catch (FileNotFoundException e1) {
-            // TODO Auto-generated catch block
+            Log.e(tag, "writeDaysToFile: FileNotFoundException");
             e1.printStackTrace();
         }
         try {
-            Log.d(tag, "writeDaysToFile: Writing outputBytes to file: " + FILENAME_DAYS);
+            Log.d(tag, "writeDaysToFile: Writing outputBytes to file: " + Data.FILENAME_DAYS);
             fos.write(outputBytes);
             fos.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            Log.e(tag, "writeDaysToFile: IOException when trying to write to FileOutputStream");
             e.printStackTrace();
         }
     }
@@ -533,18 +499,18 @@ public class MainActivity extends ActionBarActivity {
             Data.currentCountry = Country.CANADA;
         }
         try {
-            Log.d(tag, "writeCountryToFile: Opening file: " + FILENAME_COUNTRY);
-            fos = openFileOutput(FILENAME_COUNTRY, Context.MODE_PRIVATE);
+            Log.d(tag, "writeCountryToFile: Opening file: " + Data.FILENAME_COUNTRY);
+            fos = openFileOutput(Data.FILENAME_COUNTRY, Context.MODE_PRIVATE);
         } catch (FileNotFoundException e1) {
-            // TODO Auto-generated catch block
+            Log.e(tag, "writeCountryToFile: FileNotFoundException");
             e1.printStackTrace();
         }
         try {
-            Log.d(tag, "writeCountryToFile: Writing currentCountry to file: " + FILENAME_COUNTRY);
+            Log.d(tag, "writeCountryToFile: Writing currentCountry to file: " + Data.FILENAME_COUNTRY);
             fos.write(Data.currentCountry.getValue());
             fos.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            Log.e(tag, "writeCountryToFile: IOException when trying to write to FileOutputStream");
             e.printStackTrace();
         }
     }
@@ -553,26 +519,45 @@ public class MainActivity extends ActionBarActivity {
         twoOutputBytes[0] = (byte) (Data.today.get(Calendar.MONTH));
         twoOutputBytes[1] = (byte) (Data.today.get(Calendar.DAY_OF_MONTH ) - 1);
         try {
-            Log.d(tag, "writeTimestampToFile: Opening file: " + FILENAME_TIMESTAMP);
-            fos = openFileOutput(FILENAME_TIMESTAMP, Context.MODE_PRIVATE);
+            Log.d(tag, "writeTimestampToFile: Opening file: " + Data.FILENAME_TIMESTAMP);
+            fos = openFileOutput(Data.FILENAME_TIMESTAMP, Context.MODE_PRIVATE);
         } catch (FileNotFoundException e1) {
-            // TODO Auto-generated catch block
+            Log.e(tag, "writeTimestampToFile: FileNotFoundException");
             e1.printStackTrace();
         }
         try {
-            Log.d(tag, "writeTimestampToFile: Writing outputBytes to file: " + FILENAME_TIMESTAMP);
+            Log.d(tag, "writeTimestampToFile: Writing outputBytes to file: " + Data.FILENAME_TIMESTAMP);
             fos.write(twoOutputBytes);
             fos.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
+            Log.e(tag, "writeTimestampToFile: IOException when trying to write to FileOutputStream");
             e.printStackTrace();
         }
+    }
+
+    public void viewSettings(View view) {
+        Log.d(tag, "Entering viewSettings");
+        Intent i = new Intent(this, SettingsActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(i);
+        Log.d(tag, "Exiting viewSettings. SettingsActivity should have just started.");
     }
 	
 	public void viewCalendar(View view) {
         Log.d(tag, "Entering viewCalendar");
-		Intent i = new Intent(this, CalendarView.class);
-		startActivity(i);
+        /*
+        { // Using the "View Calendar" button as an "update location" button as well
+            currentLocation = locationManager.getLastKnownLocation(locationManager.getAllProviders().get(0));
+            Log.d(tag, "viewCalendar: Current Location=" + currentLocation.toString());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
+                Log.d(tag, "viewCalendar: Geocoder present, starting new GetAddressTask in background thread");
+                (new GetAddressTask(getApplicationContext())).execute(currentLocation);
+            }
+        }
+        */
+        Intent i = new Intent(this, CalendarView.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        startActivity(i);
         Log.d(tag, "Exiting viewCalendar. ViewCalendar activity should have just started.");
 	}
 
@@ -589,16 +574,12 @@ public class MainActivity extends ActionBarActivity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
+    }
 
 
     // This class copied from: http://developer.android.com/training/location/display-address.html
-    private class GetAddressTask extends
-            AsyncTask<Location, Void, String> {
+    private class GetAddressTask extends AsyncTask<Location, Void, String> {
         Context mContext;
         public GetAddressTask(Context context) {
             super();
@@ -608,7 +589,7 @@ public class MainActivity extends ActionBarActivity {
          * Get a Geocoder instance, get the latitude and longitude
          * look up the address, and return it
          *
-         * @params params One or more Location objects
+         * @param params One or more Location objects
          * @return A string containing the address of the current
          * location, or an empty string if no address can be found,
          * or an error message
@@ -616,13 +597,12 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected String doInBackground(Location... params) {
             Log.d("GetAddressTask", "Entering doInBackground");
-            Geocoder geocoder =
-                    new Geocoder(mContext, Locale.getDefault());
+            Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
             // Get the current location from the input parameter list
             Location loc = params[0];
             Log.d("GetAddressTask", "doInBackground: location lat="+loc.getLatitude()+", long="+loc.getLongitude());
             // Create a list to contain the result address
-            List<Address> addresses = null;
+            List<Address> addresses;
             try {
                 /*
                  * Return 1 address.
@@ -665,10 +645,15 @@ public class MainActivity extends ActionBarActivity {
                         address.getCountryName());
                 // Return the text
                 Log.d("GetAddressTask", "doInBackground: setting countryFromLocation to "+address.getCountryName());
-                countryFromLocation = address.getCountryName();
+                String countryFromLocation = address.getCountryName();
+                Data.currentCountry = (countryFromLocation.equals("United States") ? Country.USA : Country.CANADA);
                 Data.today = Calendar.getInstance();
-                updateDayCount();
-                updateLocationDisplay();
+                handler.post(new Runnable() {
+                    public void run() {
+                        updateDayCount();
+                        updateLocationDisplay();
+                    }
+                });
                 return addressText;
             } else {
                 return "No address found";
@@ -677,12 +662,13 @@ public class MainActivity extends ActionBarActivity {
 
         /**
          * A method that's called once doInBackground() completes.
-         */
+
         @Override
         protected void onPostExecute(String address) {
-            Log.d(tag, "onPostExecute: countryFromLocation="+countryFromLocation);
-            Data.currentCountry = (countryFromLocation == "United States" ? Country.USA : Country.CANADA);
+            //Log.d(tag, "onPostExecute: countryFromLocation="+countryFromLocation);
+            //Data.currentCountry = (countryFromLocation == "United States" ? Country.USA : Country.CANADA);
         }
+        */
     }
 
 }

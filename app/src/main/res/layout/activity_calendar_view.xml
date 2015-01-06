@@ -27,7 +27,8 @@
             android:id="@+id/selectMonthSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:prompt="@string/months_prompt" />
+            android:prompt="@string/months_prompt"
+            android:gravity="center" />
 
         <ImageButton
             android:layout_width="wrap_content"

@@ -11,7 +11,7 @@
     <string name="canada">Canada</string>
     <string name="usa">USA</string>
     <string name="no_mans_land">No man\'s land</string>
-    <string name="view_calendar_button">View Calendar</string>
+    <string name="settings">Settings</string>
     <string name="title_activity_calendar">Calendar</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_calendar_view">Calendar</string>
@@ -41,12 +41,27 @@
         <item>November</item>
         <item>December</item>
     </string-array>
-    <string-array name="empty">
-    </string-array>
+    <string-array name="empty" />
 
     <string name="select_month">Select Month:</string>
     <string name="days_in_usa">Days in the USA for month selected:</string>
-    <string name="none">None!</string>
+    <string name="none">None</string>
     <string name="title_activity_months_view">Days in USA</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="use_cloud_storage">Cloud Storage</string>
+    <string name="account">Account: </string>
+    <string name="none_yet">None yet</string>
+    <string name="logout">Logout</string>
+    <string name="login">Login</string>
+    <string name="cancel">Cancel</string>
+    <string name="create_account">Create Account</string>
+    <string name="create">Create</string>
+    <string name="username">Username:</string>
+    <string name="password">Password:</string>
+    <string name="retype_password">Re-type password:</string>
+    <string name="username_hint">username</string>
+    <string name="password_hint">password</string>
+    <string name="title_activity_create_account">Create Account</string>
+    <string name="title_activity_login">LoginActivity</string>
 
 </resources>

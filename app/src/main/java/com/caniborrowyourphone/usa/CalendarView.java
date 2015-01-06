@@ -20,12 +20,16 @@ import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+/**
+ * Class for calendar view activity of USA Days Monitor app
+ * Created by Cameron Johnston on 12/8/2014
+ */
 public class CalendarView extends ActionBarActivity implements OnItemSelectedListener {
 
     private static String tag = "CalendarView";
 
     int selectedMonth, dayOfWeek, resID;
-    ActionBar actionBar;
+    android.app.ActionBar actionBar;
     ImageButton prevMonthButton, nextMonthButton, calendarBackButton;
     Spinner selectMonthSpinner;
     Button[][] dayButtons;
@@ -74,10 +78,10 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 
     private void initializeSpinner() {
         int month, year;
-        String entry = "";
+        String entry;
         // ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.empty, android.R.layout.simple_spinner_item);
         // adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new ArrayList<String>());
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<String>());
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectMonthSpinner.setAdapter(dataAdapter);
         year = Data.today.get(Calendar.YEAR) - 1;
@@ -124,6 +128,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
             @Override
             public void onClick(View v) {
                 Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+                myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivityForResult(myIntent, 0);
             }
 
@@ -133,6 +138,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
             @Override
             public void onClick(View v) {
                 Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+                myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 startActivityForResult(myIntent, 0);
             }
 
@@ -153,9 +159,8 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
         else
             c.set(Data.today.get(Calendar.YEAR), selectedMonth, 1);
         Log.d(tag, "updateCalendarDisplay: c="+c.get(Calendar.DAY_OF_WEEK)+" "+c.get(Calendar.DAY_OF_MONTH)+"/"+(c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR));
-        sameMonthAsToday = (c.get(Calendar.MONTH) == Data.today.get(Calendar.MONTH) ? true : false);
+        sameMonthAsToday = (c.get(Calendar.MONTH) == Data.today.get(Calendar.MONTH));
 
-        // yearTextView.setText(String.valueOf(c.get(Calendar.YEAR)));
         dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
         for(int i=0; i<6; i++) {
             for(int j=0; j<7; j++) {
@@ -192,10 +197,10 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
                     doNotDisplay = (sameMonthAsToday && (prevYearFlag != dayAfterToday));
                     thisDayButton.setVisibility(View.VISIBLE);
                     thisDayButton.setText(String.valueOf(dayOfMonth));
-                    if((Data.inUSA[c.get(Calendar.MONTH)][dayOfMonth - 1]) && doNotDisplay == false) {
+                    if((Data.inUSA[c.get(Calendar.MONTH)][dayOfMonth - 1]) && !doNotDisplay) {
                         Log.d(tag, "updateCalendarDisplay: Changing background for day in USA: "+(c.get(Calendar.MONTH)+1)+"/"+dayOfMonth);
                         numDaysThisMonth++;
-                        thisDayButton.setBackgroundResource(R.drawable.usaflag64x64);
+                        thisDayButton.setBackgroundResource(R.drawable.usaflag64x64_revisedblue2);
                     }
                     else {
                         thisDayButton.setBackgroundColor(getResources().getColor(R.color.white));
@@ -227,7 +232,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
     public void onItemSelected(AdapterView<?> parent, View view,
                                int position, long id) {
         Log.d(tag, "Entering onItemSelected");
-        boolean prevYearFlag = (position==0 ? true : false);
+        boolean prevYearFlag = (position==0);
         selectMonthSpinner.setSelection(position);
         selectedMonth = (position + Data.today.get(Calendar.MONTH)) % 12;
         Log.d(tag, "onItemSelected: position of selected month="+position+", selectedMonth="+selectedMonth);
@@ -273,7 +278,6 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 
         Log.d(tag, "Exiting updateDaysInUSAList");
 	}
-	*/
 
     private String getEnding(int n) {
         switch(n) {
@@ -286,6 +290,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
             default: return "th";
         }
     }
+    */
 
     private int getNumDaysInMonth(int month) {
         switch(month) {

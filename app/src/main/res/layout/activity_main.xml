@@ -43,17 +43,6 @@
         android:text="@string/no_mans_land"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
-        android:id="@+id/viewCalendarButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/locationTextView"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="34dp"
-        android:onClick="viewCalendar"
-        android:text="@string/view_calendar_button"
-        android:clickable="true" />
-
     <LinearLayout
         android:id="@+id/mainLinearLayout"
         android:orientation="horizontal"
@@ -77,6 +66,37 @@
             android:layout_height="72dp"
             android:text="@string/entering_usa"
             android:scaleType="centerInside"
+            android:layout_marginLeft="10dp" />
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/locationTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="34dp"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:id="@+id/settingsButton"
+            android:layout_width="144dp"
+            android:layout_height="48dp"
+            android:layout_centerHorizontal="true"
+            android:onClick="viewSettings"
+            android:text="@string/settings"
+            android:clickable="true"
+            android:layout_marginRight="10dp" />
+
+        <Button
+            android:id="@+id/viewCalendarButton"
+            android:layout_width="144dp"
+            android:layout_height="48dp"
+            android:layout_centerHorizontal="true"
+            android:onClick="viewCalendar"
+            android:text="@string/calendar"
+            android:clickable="true"
             android:layout_marginLeft="10dp" />
 
         </LinearLayout>
