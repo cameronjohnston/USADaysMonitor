@@ -56,7 +56,7 @@
     <string name="cancel">Cancel</string>
     <string name="create_account">Create Account</string>
     <string name="create">Create</string>
-    <string name="username">Username:</string>
+    <string name="email">E-mail:</string>
     <string name="password">Password:</string>
     <string name="retype_password">Re-type password:</string>
     <string name="username_hint">username</string>

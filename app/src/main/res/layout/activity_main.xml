@@ -110,6 +110,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:background="@color/usaflagrevisedblue"
-        android:gravity="center" />
+        android:gravity="center"
+        android:textSize="16sp" />
 
 </RelativeLayout>

@@ -24,7 +24,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -72,6 +75,13 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
     protected void onResume() {
         super.onResume();
         updateSettingsDisplay();
+        try {
+            if(!Data.email.equals(""))
+                new DBQueryTask(Data.email, Query.READ_DATA).execute();
+        }
+        catch(NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -85,33 +95,57 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         else if(v == logoutButton) {
             Log.d(tag, "Logout button pressed.");
             Toast.makeText(SettingsActivity.this, "Logout successful.", Toast.LENGTH_LONG).show();
-            Data.username = "";
+            Data.email = "";
             updateSettingsDisplay();
         }
         else if(v == cloudStorageSwitch) {
             Log.d(tag, "toggleCloudStorage: usingCloudStorage="+cloudStorageSwitch.isChecked());
             Data.usingCloudStorage = cloudStorageSwitch.isChecked();
+            if(cloudStorageSwitch.isChecked()) {
+                try {
+                    if(!Data.email.equals(""))
+                        new DBQueryTask(Data.email, Query.ADD_DATA).execute();
+                }
+                catch(NullPointerException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
     private void updateSettingsDisplay() {
-        accountTV.setText(Data.username.equals("") ? "None" : Data.username);
+        try {
+            accountTV.setText(Data.email.equals("") ? "None" : Data.email);
 
-        loginButton.setVisibility(Data.username.equals("") ? View.VISIBLE : View.INVISIBLE);
-        createAccountButton.setVisibility(Data.username.equals("") ? View.VISIBLE : View.INVISIBLE);
-        logoutButton.setVisibility(Data.username.equals("") ? View.INVISIBLE : View.VISIBLE);
-        cloudStorageSwitch.setVisibility(Data.username.equals("") ? View.INVISIBLE : View.VISIBLE);
+            loginButton.setVisibility(Data.email.equals("") ? View.VISIBLE : View.INVISIBLE);
+            createAccountButton.setVisibility(Data.email.equals("") ? View.VISIBLE : View.INVISIBLE);
+            logoutButton.setVisibility(Data.email.equals("") ? View.INVISIBLE : View.VISIBLE);
+            cloudStorageSwitch.setVisibility(Data.email.equals("") ? View.INVISIBLE : View.VISIBLE);
+        }
+        catch (NullPointerException e) {
+            e.printStackTrace();
+            accountTV.setText("None");
+            loginButton.setVisibility(View.VISIBLE);
+            createAccountButton.setVisibility(View.VISIBLE);
+            logoutButton.setVisibility(View.INVISIBLE);
+            cloudStorageSwitch.setVisibility(View.INVISIBLE);
+        }
 
         updateUserDisplay();
     }
 
     private void updateUserDisplay() {
-        if(Data.username.equals("")) {
-            loggedInAsTV.setVisibility(View.INVISIBLE);
+        try {
+            if (Data.email.equals("")) {
+                loggedInAsTV.setVisibility(View.INVISIBLE);
+            } else {
+                loggedInAsTV.setText(Data.email);
+                loggedInAsTV.setVisibility(View.VISIBLE);
+            }
         }
-        else {
-            loggedInAsTV.setText("Logged in as "+Data.username);
-            loggedInAsTV.setVisibility(View.VISIBLE);
+        catch (NullPointerException e) {
+            loggedInAsTV.setVisibility(View.INVISIBLE);
+            e.printStackTrace();
         }
     }
 
@@ -123,7 +157,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         dialog.setTitle("Create Account");
         Button createAccountDialogButton = (Button) dialog.findViewById(R.id.createAccountDialogButton);
         Button cancelDialogButton = (Button) dialog.findViewById(R.id.cancelDialogButton);
-        final EditText usernameDialogET = (EditText)dialog.findViewById(R.id.usernameDialogEditText);
+        final EditText emailDialogET = (EditText)dialog.findViewById(R.id.emailDialogEditText);
         final EditText passwordDialogET = (EditText)dialog.findViewById(R.id.passwordDialogEditText);
         final EditText retypeDialogET = (EditText)dialog.findViewById(R.id.retypePasswordDialogEditText);
         passwordDialogET.setTypeface(Typeface.DEFAULT);
@@ -135,7 +169,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
             @Override
             public void onClick(View v) {
                 imm.hideSoftInputFromWindow(retypeDialogET.getWindowToken(), 0);
-                new DBQueryTask(usernameDialogET.getText().toString(), passwordDialogET.getText().toString(),
+                new DBQueryTask(emailDialogET.getText().toString(), passwordDialogET.getText().toString(),
                         retypeDialogET.getText().toString(), Query.CREATE_ACCOUNT).execute();
             }
         });
@@ -156,7 +190,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         dialog.setTitle("Login to your account");
         Button loginDialogButton = (Button) dialog.findViewById(R.id.loginDialogButton);
         Button cancelDialogButton = (Button) dialog.findViewById(R.id.cancelDialogButton);
-        final EditText usernameDialogET = (EditText)dialog.findViewById(R.id.usernameDialogEditText);
+        final EditText emailDialogET = (EditText)dialog.findViewById(R.id.emailDialogEditText);
         final EditText passwordDialogET = (EditText)dialog.findViewById(R.id.passwordDialogEditText);
         passwordDialogET.setTypeface(Typeface.DEFAULT);
         passwordDialogET.setTransformationMethod(new PasswordTransformationMethod());
@@ -165,7 +199,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
             @Override
             public void onClick(View v) {
                 imm.hideSoftInputFromWindow(passwordDialogET.getWindowToken(), 0);
-                new DBQueryTask(usernameDialogET.getText().toString(), passwordDialogET.getText().toString(), Query.LOGIN).execute();
+                new DBQueryTask(emailDialogET.getText().toString(), passwordDialogET.getText().toString(), Query.LOGIN).execute();
             }
         });
         cancelDialogButton.setOnClickListener(new View.OnClickListener() {
@@ -202,26 +236,26 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
 
     private class DBQueryTask extends AsyncTask<String, Void, String> {
         private final static String tag = "LoginTask";
-        private String enteredUsername, enteredPassword, enteredRetype;
+        private String enteredEmail, enteredPassword, enteredRetype;
         private Query query;
 
         public DBQueryTask(String u, Query q) {
             Log.d(tag, "Entering constructor, u="+u+", q="+q);
-            enteredUsername = u;
+            enteredEmail = u;
             enteredPassword = null;
             enteredRetype = null;
             query = q;
         }
         public DBQueryTask(String u, String p, Query q) {
             Log.d(tag, "Entering constructor, u="+u+", p="+p+", q="+q);
-            enteredUsername = u;
+            enteredEmail = u;
             enteredPassword = p;
             enteredRetype = null;
             query = q;
         }
         public DBQueryTask(String u, String p, String r, Query q) {
             Log.d(tag, "Entering constructor, u="+u+", p="+p+", r="+r+", q="+q);
-            enteredUsername = u;
+            enteredEmail = u;
             enteredPassword = p;
             enteredRetype = r;
             query = q;
@@ -240,17 +274,36 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
             switch(query) {
                 case CREATE_ACCOUNT:
                     if(enteredPassword.equals(enteredRetype)) {
-                        url = "http://johnstonclan.ca/createUser.php?username=" +
-                                enteredUsername + "&password=" + enteredPassword;
-                        Log.d(tag, "Attempting to create account with username="
-                                + enteredUsername + ", password=" + enteredPassword);
+                        url = "http://johnstonclan.ca/createUserWithoutData.php?email=" +
+                                enteredEmail + "&password=" + enteredPassword;
+                        Log.d(tag, "Attempting to create account with email="
+                                + enteredEmail + ", password=" + enteredPassword);
                     }
                     break;
                 case LOGIN:
-                    url = "http://johnstonclan.ca/login.php?username=" +
-                            enteredUsername + "&password=" + enteredPassword;
-                    Log.d(tag, "Attempting to login with username="
-                            +enteredUsername+", password="+enteredPassword);
+                    url = "http://johnstonclan.ca/login.php?email=" +
+                            enteredEmail + "&password=" + enteredPassword;
+                    Log.d(tag, "Attempting to login with email="
+                            +enteredEmail+", password="+enteredPassword);
+                    break;
+                case ADD_DATA:
+                    // Extract necessary elements to build URL
+                    String inUSA = "";
+                    for(int i=0; i<12; i++) { // For each month
+                        for(int j=0; j<31; j++) { // For each day of the month
+                            if(Data.inUSA[i][j]) inUSA += "1";
+                            else inUSA += "0";
+                        }
+                    }
+                    String currentlyInUS = (Data.currentCountry == Country.USA ? "1" : "0");
+
+                    url = "http://johnstonclan.ca/addDataToUser.php?email="+enteredEmail+
+                    "&inUSA="+inUSA+"&currentlyInUSA="+currentlyInUS;
+                    Log.d(tag, "Adding data to user="+enteredEmail);
+                    break;
+                case READ_DATA:
+                    url = "http://johnstonclan.ca/readUserData.php?email="+enteredEmail;
+                    Log.d(tag, "Reading user data: ="+enteredEmail);
                     break;
             }
                 // Send query to DB, unless CREATE_ACCOUNT and password mismatch
@@ -282,11 +335,11 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
                         switch(line) {
                             case "success":
                                 resp = "Account created successfully.";
-                                Data.username = enteredUsername;
+                                Data.email = enteredEmail;
                                 break;
                             default:
                                 if(line.contains("Duplicate")) {
-                                    resp = "Unable to create account - username already taken.";
+                                    resp = "Unable to create account - e-mail already taken.";
                                 }
                                 else {
                                     resp = "Unable to create account. "+line;
@@ -314,10 +367,10 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
                         switch(line) {
                             case "success":
                                 resp = "Login successful.";
-                                Data.username = enteredUsername;
+                                Data.email = enteredEmail;
                                 break;
                             case "userdne":
-                                resp = "No such username, try again.";
+                                resp = "No account exists with this e-mail address, try again.";
                                 break;
                             case "wrongpass":
                                 resp = "Incorrect password, try again.";
@@ -344,6 +397,71 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
                             });
                         }
                         break;
+                    case ADD_DATA:
+                        switch(line) {
+                            case "success":
+                                Log.d(tag, "ADD_DATA: Data added successfully.");
+                                resp = "Data added to cloud storage successfully.";
+                                break;
+                            default:
+                                Log.d(tag, "ADD_DATA: Error="+line);
+                                resp = line;
+                                break;
+                        }
+                        final String finalResp3 = resp;
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(SettingsActivity.this, finalResp3, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        break;
+                    case READ_DATA:
+                        // Parse json data
+                        // String s = "";
+                        String currentlyInUSA=null, monthOfLastUpdate=null, dayOfLastUpdate=null;
+                        String months[] = new String[12];
+                        JSONArray jArray = new JSONArray(line);
+
+                        for(int i=0; i<jArray.length();i++){
+                            JSONObject json = jArray.getJSONObject(i);
+                            months[0] = json.getString("jan");  months[1] = json.getString("feb");  months[2] = json.getString("mar");
+                            months[3] = json.getString("apr");  months[4] = json.getString("may");  months[5] = json.getString("jun");
+                            months[6] = json.getString("jul");  months[7] = json.getString("aug");  months[8] = json.getString("sep");
+                            months[9] = json.getString("oct");  months[10] = json.getString("nov");  months[11] = json.getString("dec");
+                            currentlyInUSA = json.getString("currentlyInUSA"); monthOfLastUpdate = json.getString("monthOfLastUpdate");
+                            dayOfLastUpdate = json.getString("dayOfLastUpdate");
+                            /*
+                            s = s +
+                                    "\njan : "+json.getString("jan")+"\nfeb : "+json.getString("feb")+"\nmar : "+json.getString("mar")+
+                                    "\napr : "+json.getString("apr")+"\nmay : "+json.getString("may")+"\njun : "+json.getString("jun")+
+                                    "\njul : "+json.getString("jul")+"\naug : "+json.getString("aug")+"\nsep : "+json.getString("sep")+
+                                    "\noct : "+json.getString("oct")+"\nnov : "+json.getString("nov")+"\ndec : "+json.getString("dec")+
+                                    "\ncurrentlyInUSA : "+json.getString("currentlyInUSA")+"\nmonth : "+json.getString("monthOfLastUpdate")
+                                    +"\nday : "+json.getString("dayOfLastUpdate");
+                            */
+                        }
+
+                        Data.numDaysInUSA = 0;
+                        for(int i=0; i<12; i++) { // For each month
+                            for(int j=0; j<31; j++) { // For each day of the month
+                                switch(months[i].charAt(j)) { // Extract single character from corresponding String
+                                    case '0':
+                                        Data.inUSA[i][j] = false;
+                                        break;
+                                    default:
+                                        Data.inUSA[i][j] = true;
+                                        Data.numDaysInUSA++;
+                                        break;
+                                }
+                            }
+                        }
+                        Data.currentCountry = (currentlyInUSA.equals("0") ? Country.CANADA : Country.USA);
+                        Data.monthOfLastUpdate = (byte) Integer.parseInt(monthOfLastUpdate);
+                        Data.dayOfLastUpdate = (byte) Integer.parseInt(dayOfLastUpdate);
+
+                        Log.d(tag, "READ_DATA: Updated currentCountry="+Data.currentCountry+", " +
+                                "monthOfLastUpdate="+Data.monthOfLastUpdate+", dayOfLastUpdate="+Data.dayOfLastUpdate);
+                        break;
                 }
             }
             catch(Exception e) {
@@ -354,112 +472,4 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         }
     }
 
-    /*
-    // This class taken from: http://developer.android.com/guide/topics/ui/dialogs.html
-    public static class LoginDialogFragment extends DialogFragment {
-        Handler dialogHandler = new Handler();
-        EditText usernameDialogET, passwordDialogET;
-        String usernameEntered, passwordEntered;
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            // Get the layout inflater
-            LayoutInflater inflater = getActivity().getLayoutInflater();
-
-            usernameDialogET = (EditText) findViewById(R.id.usernameDialogEditText);
-            passwordDialogET = (EditText) findViewById(R.id.passwordDialogEditText);
-
-            // Inflate and set the layout for the dialog
-            // Pass null as the parent view because its going in the dialog layout
-            builder.setView(inflater.inflate(R.layout.dialog_login, null))
-                    // Add action buttons
-                    .setPositiveButton(R.string.login, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            new LoginTask(usernameEntered, passwordEntered).execute();
-                        }
-                    })
-                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            LoginDialogFragment.this.getDialog().cancel();
-                        }
-                    });
-            return builder.create();
-        }
-
-        private class LoginTask extends AsyncTask<String, Void, String> {
-            private final static String tag = "LoginTask";
-            private String enteredUsername, enteredPassword;
-
-            public LoginTask(String u, String p) {
-                Log.d(tag, "Entering constructor, u="+u+", p="+p);
-                enteredUsername = u;
-                enteredPassword = p;
-            }
-
-            @Override
-            protected String doInBackground(String... params) {
-                Log.d(tag, "Entering doInBackground");
-                String resp, url, line;
-                HttpClient client;
-                HttpResponse response;
-                HttpEntity entity;
-                InputStream isr;
-                BufferedReader reader;
-                try {
-                    url = "http://johnstonclan.ca/login.php?username=" +
-                            enteredUsername + "&password=" + enteredPassword;
-                    client = new DefaultHttpClient();
-                    Log.d(tag, "Attempting to login with username="
-                            +enteredUsername+", password="+enteredPassword);
-                    response = client.execute(new HttpGet(url));
-                    entity = response.getEntity();
-                    isr = entity.getContent();
-                    // Convert response to string
-                    reader = new BufferedReader(new InputStreamReader(isr,"iso-8859-1"),8);
-                    line = reader.readLine();
-                    Log.d(tag, "Reading line: "+line);
-                    isr.close();
-
-                    switch(line) {
-                        case "success":
-                            resp = "Login successful.";
-                            Data.username = enteredUsername;
-                            break;
-                        case "userdne":
-                            resp = "Incorrect username, try again.";
-                            break;
-                        case "wrongpass":
-                            resp = "Incorrect password, try again.";
-                            break;
-                        default:
-                            resp = "Login failed. "+line; break;
-                    }
-
-                    final String finalResp = resp;
-                    if(line.equals("success")) {
-                        handler.post(new Runnable() {
-                            public void run() {
-                                Toast.makeText(appContext, finalResp, Toast.LENGTH_LONG).show();
-                                LoginDialogFragment.this.getDialog().cancel();
-                            }
-                        });
-                    }
-                    else {
-                        dialogHandler.post(new Runnable() {
-                            public void run() {
-                                Toast.makeText(appContext, finalResp, Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    }
-                }
-                catch(Exception e) {
-                    Log.d(tag, "Exception!");
-                    e.printStackTrace();
-                }
-                return "";
-            }
-        }
-    }
-*/
 }

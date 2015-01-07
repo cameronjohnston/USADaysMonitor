@@ -3,14 +3,15 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
         <EditText
-            android:id="@+id/usernameDialogEditText"
+            android:id="@+id/emailDialogEditText"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:layout_marginBottom="4dp"
-            android:hint="@string/username"/>
+            android:hint="@string/email"
+            android:inputType="textEmailAddress" />
         <EditText
             android:id="@+id/passwordDialogEditText"
             android:inputType="textPassword"
@@ -37,9 +38,15 @@
         android:orientation="horizontal" >
         <Button android:layout_width="0px"
             android:layout_height="wrap_content" android:layout_weight="0.5"
-            android:id="@+id/createAccountDialogButton" android:text="@string/create"/>
+            android:id="@+id/createAccountDialogButton" android:text="@string/create"
+            android:background="@color/usaflagred"
+            android:textColor="@color/white"
+            android:layout_marginRight="10dp" />
         <Button android:layout_width="0px"
             android:layout_height="wrap_content" android:layout_weight="0.5"
-            android:id="@+id/cancelDialogButton" android:text="@string/cancel"/>
+            android:id="@+id/cancelDialogButton" android:text="@string/cancel"
+            android:textColor="@color/white"
+            android:background="@color/usaflagred"
+            android:layout_marginLeft="10dp" />
     </LinearLayout>
 </LinearLayout>

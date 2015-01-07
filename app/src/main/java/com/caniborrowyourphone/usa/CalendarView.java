@@ -229,12 +229,17 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
     }
 
     private void updateUserDisplay() {
-        if(Data.username.equals("")) {
-            loggedInAsTV.setVisibility(View.INVISIBLE);
+        try {
+            if (Data.email.equals("")) {
+                loggedInAsTV.setVisibility(View.INVISIBLE);
+            } else {
+                loggedInAsTV.setText(Data.email);
+                loggedInAsTV.setVisibility(View.VISIBLE);
+            }
         }
-        else {
-            loggedInAsTV.setText("Logged in as "+Data.username);
-            loggedInAsTV.setVisibility(View.VISIBLE);
+        catch (NullPointerException e) {
+            loggedInAsTV.setVisibility(View.INVISIBLE);
+            e.printStackTrace();
         }
     }
 

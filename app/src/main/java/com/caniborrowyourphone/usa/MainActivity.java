@@ -19,10 +19,22 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -86,13 +98,74 @@ public class MainActivity extends ActionBarActivity {
         outputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
         twoOutputBytes = new byte[2];
 
-        if(Data.username != null) writeUsernameToFile();
+        if(Data.email != null) writeEmailToFile();
         initializeDayCount();
         updateDayCount();
         updateLocationDisplay();
         updateUserDisplay();
 
+        new GetDataTask(this).execute();
+
         Log.d(tag, "Exiting onResume");
+    }
+
+    private class GetDataTask extends AsyncTask<String, Void, String> {
+
+        private final static String tag = "FillSpinnerTask";
+        private Context context;
+
+        public GetDataTask(Context con) {
+            Log.d(tag, "Entering constructor");
+            this.context = con;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            Log.d(tag, "Entering doInBackground");
+            try{
+                String result;
+                InputStream isr;
+
+                HttpClient httpclient = new DefaultHttpClient();
+                HttpPost httppost = new HttpPost("http://johnstonclan.ca/readUserData.php?email=cameron@johnstonclan.ca");
+                HttpResponse response = httpclient.execute(httppost);
+                HttpEntity entity = response.getEntity();
+                isr = entity.getContent();
+
+                // Convert response to string
+                BufferedReader reader = new BufferedReader(new InputStreamReader(isr,"iso-8859-1"),8);
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    Log.d(tag, "Reading line: "+line);
+                    sb.append(line/* + "\n"*/);
+                }
+                isr.close();
+
+                result=sb.toString();
+
+                // Parse json data
+                String s = "";
+                JSONArray jArray = new JSONArray(result);
+
+                for(int i=0; i<jArray.length();i++){
+                    JSONObject json = jArray.getJSONObject(i);
+                    s = s +
+                            "\njan : "+json.getString("jan")+"\nfeb : "+json.getString("feb")+"\nmar : "+json.getString("mar")+
+                            "\napr : "+json.getString("apr")+"\nmay : "+json.getString("may")+"\njun : "+json.getString("jun")+
+                            "\njul : "+json.getString("jul")+"\naug : "+json.getString("aug")+"\nsep : "+json.getString("sep")+
+                            "\noct : "+json.getString("oct")+"\nnov : "+json.getString("nov")+"\ndec : "+json.getString("dec")+
+                            "\ncurrentlyInUSA : "+json.getString("currentlyInUSA")+"\nmonth : "+json.getString("monthOfLastUpdate")
+                            +"\nday : "+json.getString("dayOfLastUpdate");
+                }
+
+                Log.d(tag, "getData: final string="+s);
+
+            }catch(Exception e){
+                return "Exception: " + e.getMessage();
+            }
+            return "";
+        }
     }
 
     protected void initializeData() {
@@ -184,7 +257,7 @@ public class MainActivity extends ActionBarActivity {
 		readDaysFromFile();
         readCountryFromFile();
         readTimestampFromFile();
-        readUsernameFromFile();
+        readEmailFromFile();
         updateDaysSinceTimestamp();
         Log.d(tag, "Exiting initializeDayCount. numDaysInUSA=" + Data.numDaysInUSA);
 	}
@@ -208,12 +281,17 @@ public class MainActivity extends ActionBarActivity {
 	}
 
     private void updateUserDisplay() {
-        if(Data.username.equals("")) {
-            loggedInAsTV.setVisibility(View.INVISIBLE);
+        try {
+            if (Data.email.equals("")) {
+                loggedInAsTV.setVisibility(View.INVISIBLE);
+            } else {
+                loggedInAsTV.setText(Data.email);
+                loggedInAsTV.setVisibility(View.VISIBLE);
+            }
         }
-        else {
-            loggedInAsTV.setText("Logged in as "+Data.username);
-            loggedInAsTV.setVisibility(View.VISIBLE);
+        catch (NullPointerException e) {
+            loggedInAsTV.setVisibility(View.INVISIBLE);
+            e.printStackTrace();
         }
     }
     /**
@@ -478,30 +556,30 @@ public class MainActivity extends ActionBarActivity {
         Log.d(tag, "Exiting readTimestampFromFile");
     }
 
-    private void readUsernameFromFile() {
-        Log.d(tag, "Entering readUsernameFromFile");
+    private void readEmailFromFile() {
+        Log.d(tag, "Entering readEmailFromFile");
         String temp = "";
         int c;
         try {
-            fis = openFileInput(Data.FILENAME_USERNAME);
+            fis = openFileInput(Data.FILENAME_EMAIL);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            Log.d(tag, "readUsernameFromFile: FileNotFoundException, returning...");
+            Log.d(tag, "readEmailFromFile: FileNotFoundException, returning...");
             return;
         }
 
-        Log.d(tag, "readUsernameFromFile: File exists! Reading inputBytes...");
+        Log.d(tag, "readEmailFromFile: File exists! Reading inputBytes...");
         try {
             while( (c = fis.read()) != -1){
                 temp += Character.toString((char)c);
             }
             fis.close();
         } catch (IOException e) {
-            Log.e(tag, "readUsernameFromFile: IOException when trying to read from FileInputStream");
+            Log.e(tag, "readEmailFromFile: IOException when trying to read from FileInputStream");
             e.printStackTrace();
         }
-        Data.username = temp;
-        Log.d(tag, "Exiting readUsernameFromFile, username="+temp);
+        Data.email = temp;
+        Log.d(tag, "Exiting readEmailFromFile, email="+temp);
     }
 
     private void writeDaysToFile() {
@@ -572,20 +650,25 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private void writeUsernameToFile() {
+    private void writeEmailToFile() {
         try {
-            Log.d(tag, "writeUsernameToFile: Opening file: " + Data.FILENAME_USERNAME);
-            fos = openFileOutput(Data.FILENAME_USERNAME, Context.MODE_PRIVATE);
-        } catch (FileNotFoundException e1) {
-            Log.e(tag, "writeUsernameToFile: FileNotFoundException");
-            e1.printStackTrace();
+            try {
+                Log.d(tag, "writeEmailToFile: Opening file: " + Data.FILENAME_EMAIL);
+                fos = openFileOutput(Data.FILENAME_EMAIL, Context.MODE_PRIVATE);
+            } catch (FileNotFoundException e1) {
+                Log.e(tag, "writeEmailToFile: FileNotFoundException");
+                e1.printStackTrace();
+            }
+            try {
+                Log.d(tag, "writeEmailToFile: Writing email to file: " + Data.email);
+                if (Data.email != null) fos.write(Data.email.getBytes());
+                fos.close();
+            } catch (IOException e) {
+                Log.e(tag, "writeEmailToFile: IOException when trying to write to FileOutputStream");
+                e.printStackTrace();
+            }
         }
-        try {
-            Log.d(tag, "writeUsernameToFile: Writing username to file: " + Data.username);
-            if(Data.username != null) fos.write(Data.username.getBytes());
-            fos.close();
-        } catch (IOException e) {
-            Log.e(tag, "writeUsernameToFile: IOException when trying to write to FileOutputStream");
+        catch(NullPointerException e) {
             e.printStackTrace();
         }
     }

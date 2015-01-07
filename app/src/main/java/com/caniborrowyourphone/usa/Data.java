@@ -15,7 +15,7 @@ public class Data {
     static final String FILENAME_DAYS = "usa_days_records.txt";
     static final String FILENAME_COUNTRY = "current_country.txt";
     static final String FILENAME_TIMESTAMP = "timestamp.txt";
-    static final String FILENAME_USERNAME = "username.txt";
+    static final String FILENAME_EMAIL = "email.txt";
 
     static Country currentCountry;
     static boolean[][] inUSA;
@@ -24,5 +24,5 @@ public class Data {
     static Calendar today;
 
     static boolean usingCloudStorage;
-    static String username;
+    static String email;
 }
