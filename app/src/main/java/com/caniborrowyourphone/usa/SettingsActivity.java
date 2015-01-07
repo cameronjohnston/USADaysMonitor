@@ -2,6 +2,7 @@ package com.caniborrowyourphone.usa;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +45,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
     Dialog dialog;
     InputMethodManager imm;
 
-    TextView accountTV, loggedInAsTV;
+    TextView loggedInAsTV;
     Button loginButton, createAccountButton, logoutButton;
     Switch cloudStorageSwitch;
 
@@ -54,7 +56,6 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        accountTV = (TextView) findViewById(R.id.accountTextView);
         loggedInAsTV = (TextView) findViewById(R.id.loggedInAsTextView);
         loginButton = (Button) findViewById(R.id.loginButton);
         createAccountButton = (Button) findViewById(R.id.createAccountButton);
@@ -115,8 +116,6 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
 
     private void updateSettingsDisplay() {
         try {
-            accountTV.setText(Data.email.equals("") ? "None" : Data.email);
-
             loginButton.setVisibility(Data.email.equals("") ? View.VISIBLE : View.INVISIBLE);
             createAccountButton.setVisibility(Data.email.equals("") ? View.VISIBLE : View.INVISIBLE);
             logoutButton.setVisibility(Data.email.equals("") ? View.INVISIBLE : View.VISIBLE);
@@ -124,7 +123,6 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         }
         catch (NullPointerException e) {
             e.printStackTrace();
-            accountTV.setText("None");
             loginButton.setVisibility(View.VISIBLE);
             createAccountButton.setVisibility(View.VISIBLE);
             logoutButton.setVisibility(View.INVISIBLE);
@@ -155,6 +153,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         // Set GUI of login screen
         dialog.setContentView(R.layout.dialog_createaccount);
         dialog.setTitle("Create Account");
+
         Button createAccountDialogButton = (Button) dialog.findViewById(R.id.createAccountDialogButton);
         Button cancelDialogButton = (Button) dialog.findViewById(R.id.cancelDialogButton);
         final EditText emailDialogET = (EditText)dialog.findViewById(R.id.emailDialogEditText);
@@ -180,6 +179,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
             }
         });
         dialog.show();
+
         Log.d(tag, "Exiting login. LoginDialog should have just started.");
     }
     private void login() {

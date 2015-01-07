@@ -2,7 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.caniborrowyourphone.usa.CalendarView" >
 
     <LinearLayout
@@ -11,10 +10,11 @@
         android:gravity="center_horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/loggedInAsTextView"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp">
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -54,45 +54,73 @@
             <Button
                 android:layout_weight="1"
                 android:id="@+id/sunButton"
+                android:background="@color/usaflagrevisedblue"
                 android:clickable="false"
                 android:text="@string/Sun"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="4dp"/>
             <Button
                 android:layout_weight="1"
                 android:id="@+id/monButton"
                 android:clickable="false"
                 android:text="@string/Mon"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/usaflagrevisedblue" />
             <Button
                 android:layout_weight="1"
                 android:id="@+id/tueButton"
                 android:clickable="false"
                 android:text="@string/Tue"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/usaflagrevisedblue" />
             <Button
                 android:layout_weight="1"
                 android:id="@+id/wedButton"
                 android:clickable="false"
                 android:text="@string/Wed"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/usaflagrevisedblue" />
             <Button
                 android:layout_weight="1"
                 android:id="@+id/thuButton"
                 android:clickable="false"
                 android:text="@string/Thu"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/usaflagrevisedblue" />
             <Button
                 android:layout_weight="1"
                 android:id="@+id/friButton"
                 android:clickable="false"
                 android:text="@string/Fri"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/usaflagrevisedblue" />
             <Button
                 android:layout_weight="1"
                 android:id="@+id/satButton"
                 android:clickable="false"
                 android:text="@string/Sat"
-                android:textSize="20sp"/>
+                android:textSize="20sp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/usaflagrevisedblue" />
         </TableRow>
 
         <TableRow>
@@ -360,14 +388,15 @@
         android:id="@+id/numDaysThisMonthTextView"
         android:textSize="30sp"
         android:layout_below="@+id/numDaysThisMonthHeaderTextView"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/usaflagred" />
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="48dp"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text=""
         android:id="@+id/loggedInAsTextView"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:background="@color/usaflagrevisedblue"
         android:gravity="center"

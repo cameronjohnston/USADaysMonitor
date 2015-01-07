@@ -29,14 +29,18 @@
         <Button android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:layout_weight="0.5"
             android:id="@+id/loginDialogButton" android:text="@string/login"
-            android:background="@color/usaflagred"
+            android:background="@drawable/button_selector"
             android:textColor="@color/white"
-            android:layout_marginRight="10dp" />
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="4dp" />
         <Button android:layout_width="wrap_content"
             android:layout_height="wrap_content" android:layout_weight="0.5"
             android:id="@+id/cancelDialogButton" android:text="@string/cancel"
+            android:background="@drawable/button_selector"
+            android:layout_marginLeft="8dp"
             android:textColor="@color/white"
-            android:background="@color/usaflagred"
-            android:layout_marginLeft="10dp" />
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="4dp" />
     </LinearLayout>
 </LinearLayout>

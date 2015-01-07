@@ -21,6 +21,7 @@
     <color name="darkorrange">#cc2303</color>
     <color name="red">#ff0000</color>
     <color name="usaflagred">#bb133e</color>
+    <color name="darkred">#A5133B</color>
     <color name="limegreen">#07c700</color>
 
 </resources>

@@ -39,14 +39,14 @@
         <Button android:layout_width="0px"
             android:layout_height="wrap_content" android:layout_weight="0.5"
             android:id="@+id/createAccountDialogButton" android:text="@string/create"
-            android:background="@color/usaflagred"
+            android:background="@drawable/button_selector"
             android:textColor="@color/white"
             android:layout_marginRight="10dp" />
         <Button android:layout_width="0px"
             android:layout_height="wrap_content" android:layout_weight="0.5"
             android:id="@+id/cancelDialogButton" android:text="@string/cancel"
             android:textColor="@color/white"
-            android:background="@color/usaflagred"
+            android:background="@drawable/button_selector"
             android:layout_marginLeft="10dp" />
     </LinearLayout>
 </LinearLayout>
