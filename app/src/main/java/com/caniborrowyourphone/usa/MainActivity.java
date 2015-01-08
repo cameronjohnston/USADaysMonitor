@@ -1,5 +1,6 @@
 package com.caniborrowyourphone.usa;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
@@ -20,21 +21,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -49,23 +39,31 @@ public class MainActivity extends ActionBarActivity {
     private static final String tag = "MainActivity";
     private final Handler handler = new Handler();
 
+    ActionBar actionBar;
+
     private FileInputStream fis;
     private byte[] inputBytes, outputBytes, twoOutputBytes;
     private FileOutputStream fos;
 
     Button enteringCanadaButton, enteringUSAButton;
-	TextView locationTV, numDaysTV, loggedInAsTV;
+	TextView headerTV, locationTV, numDaysTV, loggedInAsTV, titleTV;
 	LocationManager locationManager;
     LocationListener locationListener;
     Location currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         Log.d(tag, "Entering onCreate");
-
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        actionBar = getActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.actionbar);
+
+        ((TextView) findViewById(R.id.titleTextView)).setText("USA Days Monitor");
+        findViewById(R.id.backButton).setVisibility(View.INVISIBLE);
+        findViewById(R.id.backTextView).setVisibility(View.INVISIBLE);
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -77,6 +75,7 @@ public class MainActivity extends ActionBarActivity {
         setButtonOnClickListeners();
         setLocationListener();
 
+        headerTV = (TextView) findViewById(R.id.headerTextView);
         locationTV = (TextView) findViewById(R.id.locationTextView);
         numDaysTV = (TextView) findViewById(R.id.numDaysTextView);
         loggedInAsTV = (TextView) findViewById(R.id.loggedInAsTextView);
@@ -104,68 +103,7 @@ public class MainActivity extends ActionBarActivity {
         updateLocationDisplay();
         updateUserDisplay();
 
-        new GetDataTask(this).execute();
-
         Log.d(tag, "Exiting onResume");
-    }
-
-    private class GetDataTask extends AsyncTask<String, Void, String> {
-
-        private final static String tag = "FillSpinnerTask";
-        private Context context;
-
-        public GetDataTask(Context con) {
-            Log.d(tag, "Entering constructor");
-            this.context = con;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            Log.d(tag, "Entering doInBackground");
-            try{
-                String result;
-                InputStream isr;
-
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpPost httppost = new HttpPost("http://johnstonclan.ca/readUserData.php?email=cameron@johnstonclan.ca");
-                HttpResponse response = httpclient.execute(httppost);
-                HttpEntity entity = response.getEntity();
-                isr = entity.getContent();
-
-                // Convert response to string
-                BufferedReader reader = new BufferedReader(new InputStreamReader(isr,"iso-8859-1"),8);
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    Log.d(tag, "Reading line: "+line);
-                    sb.append(line/* + "\n"*/);
-                }
-                isr.close();
-
-                result=sb.toString();
-
-                // Parse json data
-                String s = "";
-                JSONArray jArray = new JSONArray(result);
-
-                for(int i=0; i<jArray.length();i++){
-                    JSONObject json = jArray.getJSONObject(i);
-                    s = s +
-                            "\njan : "+json.getString("jan")+"\nfeb : "+json.getString("feb")+"\nmar : "+json.getString("mar")+
-                            "\napr : "+json.getString("apr")+"\nmay : "+json.getString("may")+"\njun : "+json.getString("jun")+
-                            "\njul : "+json.getString("jul")+"\naug : "+json.getString("aug")+"\nsep : "+json.getString("sep")+
-                            "\noct : "+json.getString("oct")+"\nnov : "+json.getString("nov")+"\ndec : "+json.getString("dec")+
-                            "\ncurrentlyInUSA : "+json.getString("currentlyInUSA")+"\nmonth : "+json.getString("monthOfLastUpdate")
-                            +"\nday : "+json.getString("dayOfLastUpdate");
-                }
-
-                Log.d(tag, "getData: final string="+s);
-
-            }catch(Exception e){
-                return "Exception: " + e.getMessage();
-            }
-            return "";
-        }
     }
 
     protected void initializeData() {
@@ -284,13 +222,16 @@ public class MainActivity extends ActionBarActivity {
         try {
             if (Data.email.equals("")) {
                 loggedInAsTV.setVisibility(View.INVISIBLE);
+                headerTV.setPadding(0, 0, 0, 0);
             } else {
                 loggedInAsTV.setText(Data.email);
+                headerTV.setPadding(0, (int) ((16 * getResources().getDisplayMetrics().density + 0.5f)), 0, 0);
                 loggedInAsTV.setVisibility(View.VISIBLE);
             }
         }
         catch (NullPointerException e) {
             loggedInAsTV.setVisibility(View.INVISIBLE);
+            headerTV.setPadding(0, 0, 0, 0);
             e.printStackTrace();
         }
     }
@@ -683,16 +624,6 @@ public class MainActivity extends ActionBarActivity {
 	
 	public void viewCalendar(View view) {
         Log.d(tag, "Entering viewCalendar");
-        /*
-        { // Using the "View Calendar" button as an "update location" button as well
-            currentLocation = locationManager.getLastKnownLocation(locationManager.getAllProviders().get(0));
-            Log.d(tag, "viewCalendar: Current Location=" + currentLocation.toString());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
-                Log.d(tag, "viewCalendar: Geocoder present, starting new GetAddressTask in background thread");
-                (new GetAddressTask(getApplicationContext())).execute(currentLocation);
-            }
-        }
-        */
         Intent i = new Intent(this, CalendarView.class);
         i.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
         startActivity(i);
@@ -713,6 +644,10 @@ public class MainActivity extends ActionBarActivity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
+    }
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        return false;
     }
 
 

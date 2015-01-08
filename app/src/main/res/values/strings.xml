@@ -61,6 +61,7 @@
     <string name="retype_password">Re-type password:</string>
     <string name="username_hint">username</string>
     <string name="password_hint">password</string>
+    <string name="title">Title</string>
     <string name="title_activity_create_account">Create Account</string>
     <string name="title_activity_login">LoginActivity</string>
 

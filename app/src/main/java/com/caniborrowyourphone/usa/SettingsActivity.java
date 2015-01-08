@@ -1,8 +1,9 @@
 package com.caniborrowyourphone.usa;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.res.Resources;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,23 +11,21 @@ import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -44,9 +43,11 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
     final static Handler handler = new Handler();
     Dialog dialog;
     InputMethodManager imm;
+    ActionBar actionBar;
 
-    TextView loggedInAsTV;
+    TextView loggedInAsTV, titleTextView, backTV;
     Button loginButton, createAccountButton, logoutButton;
+    ImageButton backButton;
     Switch cloudStorageSwitch;
 
     @Override
@@ -56,12 +57,23 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        actionBar = getActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.actionbar);
+
+        titleTextView = (TextView) findViewById(R.id.titleTextView);
+        titleTextView.setText(R.string.settings);
+        backButton = (ImageButton) findViewById(R.id.backButton);
+        backTV = (TextView) findViewById(R.id.backTextView);
+
         loggedInAsTV = (TextView) findViewById(R.id.loggedInAsTextView);
         loginButton = (Button) findViewById(R.id.loginButton);
         createAccountButton = (Button) findViewById(R.id.createAccountButton);
         logoutButton = (Button) findViewById(R.id.logoutButton);
         cloudStorageSwitch = (Switch) findViewById(R.id.usingCloudStorageSwitch);
 
+        backButton.setOnClickListener(this);
+        backTV.setOnClickListener(this);
         createAccountButton.setOnClickListener(this);
         loginButton.setOnClickListener(this);
         logoutButton.setOnClickListener(this);
@@ -76,13 +88,6 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
     protected void onResume() {
         super.onResume();
         updateSettingsDisplay();
-        try {
-            if(!Data.email.equals(""))
-                new DBQueryTask(Data.email, Query.READ_DATA).execute();
-        }
-        catch(NullPointerException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -111,6 +116,11 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
                     e.printStackTrace();
                 }
             }
+        }
+        else if(v == backButton || v == backTV) {
+            Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+            myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivityForResult(myIntent, 0);
         }
     }
 
@@ -218,7 +228,6 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -232,6 +241,10 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        return false;
     }
 
     private class DBQueryTask extends AsyncTask<String, Void, String> {
@@ -294,16 +307,33 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
                             if(Data.inUSA[i][j]) inUSA += "1";
                             else inUSA += "0";
                         }
+                        if(i==0) Log.d(tag, "ADD_DATA: inUSA for January: "+inUSA);
                     }
                     String currentlyInUS = (Data.currentCountry == Country.USA ? "1" : "0");
 
                     url = "http://johnstonclan.ca/addDataToUser.php?email="+enteredEmail+
                     "&inUSA="+inUSA+"&currentlyInUSA="+currentlyInUS;
-                    Log.d(tag, "Adding data to user="+enteredEmail);
+                    Log.d(tag, "ADD_DATA: Adding data to user="+enteredEmail+", currentlyInUS="+currentlyInUS);
                     break;
                 case READ_DATA:
                     url = "http://johnstonclan.ca/readUserData.php?email="+enteredEmail;
                     Log.d(tag, "Reading user data: ="+enteredEmail);
+                    break;
+                case SEND_ACTIVATION_EMAIL:
+                    url = "http://johnstonclan.ca/sendActivationEmail.php?email="+enteredEmail;
+                    Log.d(tag, "Sending activation e-mail to "+enteredEmail);
+                    break;
+                case CHECK_IF_ACTIVATED:
+                    url = "http://johnstonclan.ca/checkIfActivated.php?email="+enteredEmail;
+                    Log.d(tag, "Checking if account activated: "+enteredEmail);
+                    break;
+                case CHECK_IF_USING_CLOUD:
+                    url = "http://johnstonclan.ca/checkIfUsingCloudStorage.php?email="+enteredEmail;
+                    Log.d(tag, "Checking if using cloud storage: "+enteredEmail);
+                    break;
+                case DISABLE_CLOUD:
+                    url = "http://johnstonclan.ca/setUsingCloudStorage.php?email="+enteredEmail+"&using=0";
+                    Log.d(tag, "Disabling cloud storage for "+enteredEmail);
                     break;
             }
                 // Send query to DB, unless CREATE_ACCOUNT and password mismatch
@@ -461,6 +491,86 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
 
                         Log.d(tag, "READ_DATA: Updated currentCountry="+Data.currentCountry+", " +
                                 "monthOfLastUpdate="+Data.monthOfLastUpdate+", dayOfLastUpdate="+Data.dayOfLastUpdate);
+                        break;
+                    case SEND_ACTIVATION_EMAIL:
+                        switch(line) {
+                            case "1":
+                                Log.d(tag, "SEND_ACTIVATION_EMAIL: E-mail accepted to be sent.");
+                                resp = "You should receive an e-mail shortly to activate your account.";
+                                break;
+                            default:
+                                Log.d(tag, "SEND_ACTIVATION_EMAIL: Error="+line);
+                                resp = line;
+                                break;
+                        }
+                        final String finalResp4 = resp;
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(SettingsActivity.this, finalResp4, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        break;
+                    case CHECK_IF_ACTIVATED:
+                        switch(line) {
+                            case "true":
+                                Log.d(tag, "CHECK_IF_ACTIVATED: Activated.");
+                                resp = "Account has been activated.";
+                                break;
+                            case "false":
+                                Log.d(tag, "CHECK_IF_ACTIVATED: Not activated.");
+                                resp = "Account has not been activated.";
+                                break;
+                            default:
+                                Log.d(tag, "CHECK_IF_ACTIVATED: Error="+line);
+                                resp = line;
+                                break;
+                        }
+                        final String finalResp5 = resp;
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(SettingsActivity.this, finalResp5, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        break;
+                    case CHECK_IF_USING_CLOUD:
+                        switch(line) {
+                            case "true":
+                                Log.d(tag, "CHECK_IF_USING_CLOUD: Using cloud storage.");
+                                resp = "Using cloud storage.";
+                                break;
+                            case "false":
+                                Log.d(tag, "CHECK_IF_USING_CLOUD: Not using cloud storage.");
+                                resp = "Not using cloud storage.";
+                                break;
+                            default:
+                                Log.d(tag, "CHECK_IF_USING_CLOUD: Error="+line);
+                                resp = line;
+                                break;
+                        }
+                        final String finalResp7 = resp;
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(SettingsActivity.this, finalResp7, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        break;
+                    case DISABLE_CLOUD:
+                        switch(line) {
+                            case "success":
+                                Log.d(tag, "DISABLE_CLOUD: Success.");
+                                resp = "Successfully disabled cloud storage.";
+                                break;
+                            default:
+                                Log.d(tag, "DISABLE_CLOUD: Error="+line);
+                                resp = line;
+                                break;
+                        }
+                        final String finalResp8 = resp;
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(SettingsActivity.this, finalResp8, Toast.LENGTH_LONG).show();
+                            }
+                        });
                         break;
                 }
             }

@@ -13,8 +13,7 @@
         android:layout_below="@+id/loggedInAsTextView"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="8dp">
+        android:layout_centerHorizontal="true">
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -47,11 +46,11 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="false"
         android:id="@+id/calendarTableLayout">
 
         <TableRow>
             <Button
+                android:layout_height="44dp"
                 android:layout_weight="1"
                 android:id="@+id/sunButton"
                 android:background="@color/usaflagrevisedblue"
@@ -62,6 +61,7 @@
                 android:layout_marginRight="2dp"
                 android:layout_marginBottom="4dp"/>
             <Button
+                android:layout_height="44dp"
                 android:layout_weight="1"
                 android:id="@+id/monButton"
                 android:clickable="false"
@@ -72,6 +72,7 @@
                 android:layout_marginBottom="4dp"
                 android:background="@color/usaflagrevisedblue" />
             <Button
+                android:layout_height="44dp"
                 android:layout_weight="1"
                 android:id="@+id/tueButton"
                 android:clickable="false"
@@ -82,6 +83,7 @@
                 android:layout_marginBottom="4dp"
                 android:background="@color/usaflagrevisedblue" />
             <Button
+                android:layout_height="44dp"
                 android:layout_weight="1"
                 android:id="@+id/wedButton"
                 android:clickable="false"
@@ -92,6 +94,7 @@
                 android:layout_marginBottom="4dp"
                 android:background="@color/usaflagrevisedblue" />
             <Button
+                android:layout_height="44dp"
                 android:layout_weight="1"
                 android:id="@+id/thuButton"
                 android:clickable="false"
@@ -102,6 +105,7 @@
                 android:layout_marginBottom="4dp"
                 android:background="@color/usaflagrevisedblue" />
             <Button
+                android:layout_height="44dp"
                 android:layout_weight="1"
                 android:id="@+id/friButton"
                 android:clickable="false"
@@ -112,6 +116,7 @@
                 android:layout_marginBottom="4dp"
                 android:background="@color/usaflagrevisedblue" />
             <Button
+                android:layout_height="44dp"
                 android:layout_weight="1"
                 android:id="@+id/satButton"
                 android:clickable="false"
