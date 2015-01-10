@@ -26,5 +26,5 @@ public class Data {
 
     static Mode mode;
     static String email;
-    static boolean loggedIn;
+    static boolean loggedIn, justLoggedOut;
 }

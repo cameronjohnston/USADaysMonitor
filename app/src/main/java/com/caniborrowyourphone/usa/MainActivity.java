@@ -74,15 +74,6 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        readEmailFromFile();
-        try {
-            Data.loggedIn = (!Data.email.equals(""));
-        }
-        catch(NullPointerException e) {
-            Data.loggedIn = false;
-            e.printStackTrace();
-        }
-
         actionBar = getSupportActionBar();
         actionBar.setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         actionBar.setCustomView(R.layout.actionbar);
@@ -121,17 +112,29 @@ public class MainActivity extends ActionBarActivity {
 
         initializeData();
 
-        if(Data.loggedIn) {
-            Log.d(tag, "onResume: loggedIn=true, performing initializations.");
-            if (Data.email != null) writeEmailToFile();
-            readLocalData();
-            updateDataAndDisplay();
+        readEmailFromFile();
+        try {
+            if(Data.email.equals("")) {
+                Log.d(tag, "onResume: e-mail=\"\". Setting loggedIn=false, skipping initializations and calling login().");
+                Data.loggedIn = false;
+                login("");
+            }
+            else {
+                Log.d(tag, "onResume: e-mail="+Data.email+", loggedIn=true. Writing e-mail to file and performing initializations.");
+                Data.loggedIn = true;
+                writeEmailToFile();
+                readLocalData();
+                updateDataAndDisplay();
+            }
         }
-        else {
-            Log.d(tag, "onResume: loggedIn=false, skipping initializations and calling getStarted().");
+        catch(NullPointerException e) {
+            Log.d(tag, "onResume: e-mail=null. Setting loggedIn=false, skipping initializations and calling getStarted().");
+            Data.loggedIn = false;
             getStarted();
+            e.printStackTrace();
         }
 
+        Data.justLoggedOut = false;
         Log.d(tag, "Exiting onResume");
     }
 
@@ -172,7 +175,10 @@ public class MainActivity extends ActionBarActivity {
         Log.d(tag, "Exiting getStarted. GetStartedDialog should have just started.");
     }
     private void login(String accountCreatedMessage) {
-        Log.d(tag, "Login button pressed.");
+        Log.d(tag, "entering login().");
+        if(Data.justLoggedOut) {
+            Toast.makeText(getApplicationContext(), "Logged out successfully.", Toast.LENGTH_LONG).show();
+        }
         dialog = new Dialog(this);
         dialog.setCanceledOnTouchOutside(false);
         // Set GUI of login screen
@@ -362,8 +368,7 @@ public class MainActivity extends ActionBarActivity {
             loggedInAsTV.setVisibility(View.VISIBLE);
         }
         catch (NullPointerException e) {
-            loggedInAsTV.setVisibility(View.INVISIBLE);
-            headerTV.setPadding(0, 0, 0, 0);
+            getStarted();
             e.printStackTrace();
         }
     }
@@ -713,8 +718,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void writeTimestampToFile() {
-        twoOutputBytes[0] = (byte) (Data.today.get(Calendar.MONTH));
-        twoOutputBytes[1] = (byte) (Data.today.get(Calendar.DAY_OF_MONTH ) - 1);
+        Data.monthOfLastUpdate = (byte) (Data.today.get(Calendar.MONTH));
+        Data.dayOfLastUpdate = (byte) (Data.today.get(Calendar.DAY_OF_MONTH ) - 1);
+        twoOutputBytes[0] = Data.monthOfLastUpdate;
+        twoOutputBytes[1] = Data.dayOfLastUpdate;
+        Log.d(tag, "writeTimestampToFile: month="+Data.monthOfLastUpdate+", day="+ Data.dayOfLastUpdate);
         try {
             Log.d(tag, "writeTimestampToFile: Opening file: " + Data.FILENAME_TIMESTAMP);
             fos = openFileOutput(Data.FILENAME_TIMESTAMP, Context.MODE_PRIVATE);
@@ -1079,7 +1087,6 @@ public class MainActivity extends ActionBarActivity {
                                 }
                             }
                         }
-                        updateNumDaysInUSA();
                         try {
                             Data.currentCountry = (currentlyInUSA.equals("0") ? Country.CANADA : Country.USA);
                         } catch(NullPointerException e) {

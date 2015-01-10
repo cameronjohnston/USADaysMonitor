@@ -852,7 +852,7 @@ containing a value of this type.
         public static final int usaflag800x421_revisedblue2=0x7f020060;
     }
     public static final class id {
-        public static final int accountCreatedTextView=0x7f090087;
+        public static final int accountCreatedTextView=0x7f090084;
         public static final int action_bar=0x7f09001c;
         public static final int action_bar_activity_content=0x7f090000;
         public static final int action_bar_container=0x7f09001b;
@@ -864,7 +864,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f090001;
         public static final int action_menu_presenter=0x7f090002;
         public static final int action_mode_close_button=0x7f090024;
-        public static final int action_settings=0x7f090092;
+        public static final int action_settings=0x7f09008f;
         public static final int activity_chooser_view_content=0x7f090025;
         public static final int always=0x7f090013;
         public static final int backButton=0x7f09003c;
@@ -872,19 +872,18 @@ containing a value of this type.
         public static final int beginning=0x7f09000f;
         public static final int calendarLinearLayout=0x7f09003f;
         public static final int calendarTableLayout=0x7f090044;
-        public static final int cancelDialogButton=0x7f09008d;
+        public static final int cancelDialogButton=0x7f09008a;
         public static final int checkbox=0x7f09002d;
         public static final int collapseActionView=0x7f090014;
-        public static final int createAccountButton=0x7f090084;
-        public static final int createAccountDialogButton=0x7f09008c;
-        public static final int createAccountTextView=0x7f090091;
+        public static final int createAccountDialogButton=0x7f090089;
+        public static final int createAccountTextView=0x7f09008e;
         public static final int currentlyInTextView=0x7f09007a;
         public static final int default_activity_button=0x7f090028;
         public static final int dialog=0x7f090018;
         public static final int disableHome=0x7f090009;
         public static final int dropdown=0x7f090019;
         public static final int edit_query=0x7f090030;
-        public static final int emailDialogEditText=0x7f090089;
+        public static final int emailDialogEditText=0x7f090086;
         public static final int end=0x7f090010;
         public static final int enteringCanadaButton=0x7f09007d;
         public static final int enteringUSAButton=0x7f09007e;
@@ -903,19 +902,17 @@ containing a value of this type.
         public static final int icon=0x7f09002a;
         public static final int ifRoom=0x7f090015;
         public static final int image=0x7f090027;
-        public static final int linearLayout2=0x7f090082;
         public static final int listMode=0x7f090006;
         public static final int list_item=0x7f090029;
         public static final int locationTextView=0x7f09007c;
         public static final int loggedInAsTextView=0x7f090040;
-        public static final int loginButton=0x7f090083;
-        public static final int loginDialogButton=0x7f090090;
-        public static final int loginTextView=0x7f09008f;
-        public static final int logoutButton=0x7f090085;
+        public static final int loginDialogButton=0x7f09008d;
+        public static final int loginTextView=0x7f09008c;
+        public static final int logoutButton=0x7f090082;
         public static final int main=0x7f090081;
         public static final int mainLinearLayout=0x7f09007b;
         public static final int middle=0x7f090011;
-        public static final int minimizeDataUsageSwitch=0x7f090086;
+        public static final int minimizeDataUsageSwitch=0x7f090083;
         public static final int monButton=0x7f090046;
         public static final int monButton1=0x7f09004d;
         public static final int monButton2=0x7f090054;
@@ -930,13 +927,13 @@ containing a value of this type.
         public static final int numDaysTextView=0x7f090079;
         public static final int numDaysThisMonthHeaderTextView=0x7f090076;
         public static final int numDaysThisMonthTextView=0x7f090077;
-        public static final int okDialogButton=0x7f090088;
-        public static final int passwordDialogEditText=0x7f09008a;
+        public static final int okDialogButton=0x7f090085;
+        public static final int passwordDialogEditText=0x7f090087;
         public static final int prevMonthButton=0x7f090041;
         public static final int progress_circular=0x7f090004;
         public static final int progress_horizontal=0x7f090005;
         public static final int radio=0x7f09002f;
-        public static final int retypePasswordDialogEditText=0x7f09008b;
+        public static final int retypePasswordDialogEditText=0x7f090088;
         public static final int satButton=0x7f09004b;
         public static final int satButton1=0x7f090052;
         public static final int satButton2=0x7f090059;
@@ -970,7 +967,7 @@ containing a value of this type.
         public static final int sunButton5=0x7f090068;
         public static final int sunButton6=0x7f09006f;
         public static final int tabMode=0x7f090008;
-        public static final int textView=0x7f09008e;
+        public static final int textView=0x7f09008b;
         public static final int thuButton=0x7f090049;
         public static final int thuButton1=0x7f090050;
         public static final int thuButton2=0x7f090057;
@@ -1124,6 +1121,9 @@ containing a value of this type.
  API 14 theme customizations can go here. 
          */
         public static final int AppBaseTheme=0x7f0c0000;
+        /**  All customizations that are NOT specific to a particular API-level can go here. 
+ <item name="android:actionBarStyle">@style/MyActionBarStyle</item> 
+         */
         public static final int AppTheme=0x7f0c0001;
         public static final int DialogWindowTitle=0x7f0c0002;
         public static final int LoginDialog=0x7f0c0003;
