@@ -1,8 +1,9 @@
 package com.caniborrowyourphone.usa;
 
-import android.app.ActionBar;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -13,18 +14,33 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -39,17 +55,18 @@ public class MainActivity extends ActionBarActivity {
     private static final String tag = "MainActivity";
     private final Handler handler = new Handler();
 
-    ActionBar actionBar;
+    android.support.v7.app.ActionBar actionBar;
+    InputMethodManager imm;
+    Dialog dialog;
 
     private FileInputStream fis;
     private byte[] inputBytes, outputBytes, twoOutputBytes;
     private FileOutputStream fos;
 
     Button enteringCanadaButton, enteringUSAButton;
-	TextView headerTV, locationTV, numDaysTV, loggedInAsTV, titleTV;
+	TextView headerTV, locationTV, numDaysTV, loggedInAsTV;
 	LocationManager locationManager;
     LocationListener locationListener;
-    Location currentLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +74,17 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        actionBar = getActionBar();
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        readEmailFromFile();
+        try {
+            Data.loggedIn = (!Data.email.equals(""));
+        }
+        catch(NullPointerException e) {
+            Data.loggedIn = false;
+            e.printStackTrace();
+        }
+
+        actionBar = getSupportActionBar();
+        actionBar.setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         actionBar.setCustomView(R.layout.actionbar);
 
         ((TextView) findViewById(R.id.titleTextView)).setText("USA Days Monitor");
@@ -80,6 +106,8 @@ public class MainActivity extends ActionBarActivity {
         numDaysTV = (TextView) findViewById(R.id.numDaysTextView);
         loggedInAsTV = (TextView) findViewById(R.id.loggedInAsTextView);
 
+        imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+
         Log.d(tag, "Exiting onCreate");
     }
 
@@ -93,17 +121,106 @@ public class MainActivity extends ActionBarActivity {
 
         initializeData();
 
-        inputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
-        outputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
-        twoOutputBytes = new byte[2];
-
-        if(Data.email != null) writeEmailToFile();
-        initializeDayCount();
-        updateDayCount();
-        updateLocationDisplay();
-        updateUserDisplay();
+        if(Data.loggedIn) {
+            Log.d(tag, "onResume: loggedIn=true, performing initializations.");
+            if (Data.email != null) writeEmailToFile();
+            readLocalData();
+            updateDataAndDisplay();
+        }
+        else {
+            Log.d(tag, "onResume: loggedIn=false, skipping initializations and calling getStarted().");
+            getStarted();
+        }
 
         Log.d(tag, "Exiting onResume");
+    }
+
+    private void getStarted() {
+        dialog = new Dialog(this);
+        dialog.setCanceledOnTouchOutside(false);
+        // Set GUI of login screen
+        dialog.setContentView(R.layout.dialog_getstarted);
+        dialog.setTitle("Getting Started");
+
+        Button createAccountDialogButton = (Button) dialog.findViewById(R.id.createAccountDialogButton);
+        final EditText emailDialogET = (EditText)dialog.findViewById(R.id.emailDialogEditText);
+        final EditText passwordDialogET = (EditText)dialog.findViewById(R.id.passwordDialogEditText);
+        final EditText retypeDialogET = (EditText)dialog.findViewById(R.id.retypePasswordDialogEditText);
+        TextView loginTV = (TextView)dialog.findViewById(R.id.loginTextView);
+
+        passwordDialogET.setTypeface(Typeface.DEFAULT);
+        passwordDialogET.setTransformationMethod(new PasswordTransformationMethod());
+        retypeDialogET.setTypeface(Typeface.DEFAULT);
+        retypeDialogET.setTransformationMethod(new PasswordTransformationMethod());
+        // Attached listener for login GUI button
+        createAccountDialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imm.hideSoftInputFromWindow(retypeDialogET.getWindowToken(), 0);
+                new DBQueryTask(emailDialogET.getText().toString(), passwordDialogET.getText().toString(), Query.CREATE_ACCOUNT).execute();
+            }
+        });
+        loginTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imm.hideSoftInputFromWindow(retypeDialogET.getWindowToken(), 0);
+                dialog.dismiss();
+                login("");
+            }
+        });
+        dialog.show();
+        Log.d(tag, "Exiting getStarted. GetStartedDialog should have just started.");
+    }
+    private void login(String accountCreatedMessage) {
+        Log.d(tag, "Login button pressed.");
+        dialog = new Dialog(this);
+        dialog.setCanceledOnTouchOutside(false);
+        // Set GUI of login screen
+        dialog.setContentView(R.layout.dialog_login);
+        dialog.setTitle("Login to your account");
+        Button loginDialogButton = (Button) dialog.findViewById(R.id.loginDialogButton);
+        TextView createAccountTV = (TextView) dialog.findViewById(R.id.createAccountTextView);
+        final EditText emailDialogET = (EditText)dialog.findViewById(R.id.emailDialogEditText);
+        final EditText passwordDialogET = (EditText)dialog.findViewById(R.id.passwordDialogEditText);
+        passwordDialogET.setTypeface(Typeface.DEFAULT);
+        passwordDialogET.setTransformationMethod(new PasswordTransformationMethod());
+        // Attached listener for login GUI button
+        loginDialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imm.hideSoftInputFromWindow(passwordDialogET.getWindowToken(), 0);
+                new DBQueryTask(emailDialogET.getText().toString(), passwordDialogET.getText().toString(), Query.LOGIN).execute();
+            }
+        });
+        createAccountTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imm.hideSoftInputFromWindow(passwordDialogET.getWindowToken(), 0);
+                dialog.dismiss();
+                getStarted();
+            }
+        });
+        dialog.show();
+        if(!accountCreatedMessage.equals("")) {
+            Log.d(tag, "Creating new Dialog with accountCreatedMessage="+accountCreatedMessage);
+            final Dialog dialog2 = new Dialog(this);
+            dialog2.setCanceledOnTouchOutside(false);
+            // Set GUI of login screen
+            dialog2.setContentView(R.layout.dialog_accountcreated);
+            dialog2.setTitle("Activate Your Account");
+
+            Button okDialogButton = (Button) dialog2.findViewById(R.id.okDialogButton);
+            TextView accountCreatedTV = (TextView) dialog2.findViewById(R.id.accountCreatedTextView);
+            accountCreatedTV.setText(accountCreatedMessage);
+            okDialogButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog2.dismiss();
+                }
+            });
+            dialog2.show();
+        }
+        Log.d(tag, "Exiting login. LoginDialog should have just started.");
     }
 
     protected void initializeData() {
@@ -112,6 +229,10 @@ public class MainActivity extends ActionBarActivity {
         Data.monthOfLastUpdate = 0x0; // Should always be between 0-11 inclusive
         Data.dayOfLastUpdate = 0x0; // Should always be between 0-30 inclusive
         Data.today = Calendar.getInstance(); // Initialize to current date
+
+        inputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
+        outputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
+        twoOutputBytes = new byte[2];
     }
 	
 	private void setButtonOnClickListeners() {
@@ -127,8 +248,7 @@ public class MainActivity extends ActionBarActivity {
                 else {
                     Data.currentCountry = Country.CANADA;
                     Data.today = Calendar.getInstance();
-                    updateDayCount();
-                    updateLocationDisplay();
+                    updateDataAndDisplay();
                 }
 			}
 			
@@ -146,8 +266,7 @@ public class MainActivity extends ActionBarActivity {
                 else {
                     Data.currentCountry = Country.USA;
                     Data.today = Calendar.getInstance();
-                    updateDayCount();
-                    updateLocationDisplay();
+                    updateDataAndDisplay();
                 }
 			}
 			
@@ -190,44 +309,57 @@ public class MainActivity extends ActionBarActivity {
 		}
 	}
 	
-	private void initializeDayCount() {
-        Log.d(tag, "Entering initializeDayCount, calling read methods");
+	private void readLocalData() {
+        Log.d(tag, "Entering readLocalData, calling read methods");
 		readDaysFromFile();
         readCountryFromFile();
         readTimestampFromFile();
-        readEmailFromFile();
-        updateDaysSinceTimestamp();
-        Log.d(tag, "Exiting initializeDayCount. numDaysInUSA=" + Data.numDaysInUSA);
+        Log.d(tag, "Exiting readLocalData. numDaysInUSA=" + Data.numDaysInUSA);
 	}
 
+    /**
+     * Updates the day count display, then calls writeDataToFiles().
+     */
     private void updateDayCount() {
         Log.d(tag, "Entering updateDayCount");
+        Data.today = Calendar.getInstance();
 		if(Data.currentCountry == Country.USA) { // Set today to true
 			Data.inUSA[Data.today.get(Calendar.MONTH)][Data.today.get(Calendar.DAY_OF_MONTH) - 1] = true;
-            Log.d(tag, "updateDayCount: currentCountry = USA. Setting entry of inUSA to true: [" + Data.today.get(Calendar.MONTH) + "][" + (Data.today.get(Calendar.DAY_OF_MONTH) - 1) + "]");
+            Log.d(tag, "updateDayCount: currentCountry = USA. Setting entry of inUSA to true: ["
+                    + Data.today.get(Calendar.MONTH) + "][" + (Data.today.get(Calendar.DAY_OF_MONTH) - 1) + "]");
 		}
 
-        Log.d(tag, "updateDayCount: calling writeDaysToFile method, numDaysInUSA=" + Data.numDaysInUSA);
-        writeDaysToFile();
-        Log.d(tag, "updateDayCount: calling writeCountryToFile method, currentCountry=" + Data.currentCountry);
-        writeCountryToFile();
-        Log.d(tag, "updateDayCount: calling writeTimestampToFile method, month=" + Data.monthOfLastUpdate + ", day=" + Data.dayOfLastUpdate);
-        writeTimestampToFile();
+        writeDataToFiles();
 
         Log.d(tag, "Exiting updateDayCount: numDaysInUSA=" + Data.numDaysInUSA);
-		numDaysTV.setText(Integer.toString(Data.numDaysInUSA));
 	}
+
+    private void updateNumDaysInUSA() {
+        Data.numDaysInUSA = 0;
+        for(int i=0; i<12; i++) {
+            for(int j=0; j<31; j++) {
+                if(Data.inUSA[i][j]) {
+                    Data.numDaysInUSA++;
+                }
+            }
+        }
+        numDaysTV.setText(Integer.toString(Data.numDaysInUSA));
+    }
+
+    private void writeDataToFiles() {
+        Log.d(tag, "writeDataToFiles: calling writeDaysToFile, numDaysInUSA=" + Data.numDaysInUSA);
+        writeDaysToFile();
+        Log.d(tag, "writeDataToFiles: calling writeCountryToFile, currentCountry=" + Data.currentCountry);
+        writeCountryToFile();
+        Log.d(tag, "writeDataToFiles: calling writeTimestampToFile, month=" + Data.monthOfLastUpdate + ", day=" + Data.dayOfLastUpdate);
+        writeTimestampToFile();
+    }
 
     private void updateUserDisplay() {
         try {
-            if (Data.email.equals("")) {
-                loggedInAsTV.setVisibility(View.INVISIBLE);
-                headerTV.setPadding(0, 0, 0, 0);
-            } else {
-                loggedInAsTV.setText(Data.email);
-                headerTV.setPadding(0, (int) ((16 * getResources().getDisplayMetrics().density + 0.5f)), 0, 0);
-                loggedInAsTV.setVisibility(View.VISIBLE);
-            }
+            loggedInAsTV.setText(Data.email);
+            headerTV.setPadding(0, (int) ((16 * getResources().getDisplayMetrics().density + 0.5f)), 0, 0);
+            loggedInAsTV.setVisibility(View.VISIBLE);
         }
         catch (NullPointerException e) {
             loggedInAsTV.setVisibility(View.INVISIBLE);
@@ -357,8 +489,16 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         }
-
         Log.d(tag, "Exiting updateDaysSinceTimestamp");
+    }
+
+    private void updateDataAndDisplay() {
+        Data.today = Calendar.getInstance();
+        updateDaysSinceTimestamp();
+        updateDayCount();
+        updateNumDaysInUSA();
+        updateLocationDisplay();
+        updateUserDisplay();
     }
 
     int getNumDaysInMonth(int month) {
@@ -395,7 +535,6 @@ public class MainActivity extends ActionBarActivity {
 
     private void readDaysFromFile() {
         int i, j, numBytesRead;
-        Data.numDaysInUSA = 0;
         boolean fileExists = true;
         try {
             fis = openFileInput(Data.FILENAME_DAYS);
@@ -424,7 +563,6 @@ public class MainActivity extends ActionBarActivity {
                     if(inputBytes[i*31 + j] > 0) {
                         Log.d(tag, "readDaysFromFile: inUSA=true for day: " + (i+1) + "/" + (j+1));
                         Data.inUSA[i][j] = true;
-                        Data.numDaysInUSA++;
                     }
                     else {
                         Data.inUSA[i][j] = false;
@@ -523,14 +661,17 @@ public class MainActivity extends ActionBarActivity {
         Log.d(tag, "Exiting readEmailFromFile, email="+temp);
     }
 
+    private void readDataFromCloud() {
+        Log.d(tag, "Reading data from cloud for email="+Data.email);
+        new DBQueryTask(Data.email, Query.READ_DATA).execute();
+    }
+
     private void writeDaysToFile() {
         int i, j;
         int index = 0;
-        Data.numDaysInUSA = 0;
         for(i=0; i<12; i++) {
             for(j=0; j<31; j++) {
                 outputBytes[index++] = (byte) (Data.inUSA[i][j] ? 1 : 0);
-                if(Data.inUSA[i][j]) Data.numDaysInUSA++; // Add day if required
             }
         }
         try {
@@ -723,14 +864,287 @@ public class MainActivity extends ActionBarActivity {
                 Data.today = Calendar.getInstance();
                 handler.post(new Runnable() {
                     public void run() {
-                        updateDayCount();
-                        updateLocationDisplay();
+                        updateDataAndDisplay();
                     }
                 });
                 return addressText;
             } else {
                 return "No address found";
             }
+        }
+    }
+
+    private class DBQueryTask extends AsyncTask<String, Void, String> {
+        private final static String tag = "DBQueryTask";
+        private String enteredEmail, enteredPassword;
+        private Query query;
+
+        public DBQueryTask(String u, Query q) {
+            Log.d(tag, "Entering constructor, u="+u+", q="+q);
+            enteredEmail = u;
+            enteredPassword = null;
+            query = q;
+        }
+        public DBQueryTask(String u, String p, Query q) {
+            Log.d(tag, "Entering constructor, u="+u+", p="+p+", q="+q);
+            enteredEmail = u;
+            enteredPassword = p;
+            query = q;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            Log.d(tag, "Entering doInBackground");
+            String resp, url = null, line;
+            HttpClient client;
+            HttpResponse response;
+            HttpEntity entity;
+            InputStream isr;
+            BufferedReader reader;
+            try {
+                switch(query) {
+                    case CREATE_ACCOUNT:
+                        url = "http://johnstonclan.ca/createUserWithoutData.php?email=" +
+                                enteredEmail + "&password=" + enteredPassword;
+                        Log.d(tag, "Attempting to create account with email="
+                                + enteredEmail + ", password=" + enteredPassword);
+                        break;
+                    case LOGIN:
+                        url = "http://johnstonclan.ca/login.php?email=" +
+                                enteredEmail + "&password=" + enteredPassword;
+                        Log.d(tag, "Attempting to login with email="
+                                +enteredEmail+", password="+enteredPassword);
+                        break;
+                    case ADD_DATA:
+                        // Extract necessary elements to build URL
+                        String inUSA = "";
+                        for(int i=0; i<12; i++) { // For each month
+                            for(int j=0; j<31; j++) { // For each day of the month
+                                if(Data.inUSA[i][j]) inUSA += "1";
+                                else inUSA += "0";
+                            }
+                            if(i==0) Log.d(tag, "ADD_DATA: inUSA for January: "+inUSA);
+                        }
+                        String currentlyInUS = (Data.currentCountry == Country.USA ? "1" : "0");
+
+                        url = "http://johnstonclan.ca/addDataToUser.php?email="+enteredEmail+
+                                "&inUSA="+inUSA+"&currentlyInUSA="+currentlyInUS;
+                        Log.d(tag, "ADD_DATA: Adding data to user="+enteredEmail+", currentlyInUS="+currentlyInUS);
+                        break;
+                    case READ_DATA:
+                        url = "http://johnstonclan.ca/readUserData.php?email="+enteredEmail;
+                        Log.d(tag, "Reading user data: ="+enteredEmail);
+                        break;
+                    case SEND_ACTIVATION_EMAIL:
+                        url = "http://johnstonclan.ca/sendActivationEmail.php?email="+enteredEmail;
+                        Log.d(tag, "Sending activation e-mail to "+enteredEmail);
+                        break;
+                    case CHECK_IF_ACTIVATED:
+                        url = "http://johnstonclan.ca/checkIfActivated.php?email="+enteredEmail;
+                        Log.d(tag, "Checking if account activated: "+enteredEmail);
+                        break;
+                }
+                // Send query to DB
+                client = new DefaultHttpClient();
+                response = client.execute(new HttpGet(url));
+                entity = response.getEntity();
+                isr = entity.getContent();
+                // Convert response to string
+                reader = new BufferedReader(new InputStreamReader(isr,"iso-8859-1"),8);
+                line = reader.readLine();
+                Log.d(tag, "Reading line: "+line);
+                isr.close();
+
+                switch(query) {
+                    case CREATE_ACCOUNT:
+                        switch(line) {
+                            case "success":
+                                resp = "Account created successfully.\n" +
+                                        "You will receive an activation\n" +
+                                        "e-mail within a few minutes at\n"+enteredEmail+
+                                        ".\nFollow the e-mail link to\n" +
+                                        "activate your account.\n" +
+                                        "Note that you cannot log in until\n" +
+                                        "completing this activation.";
+                                break;
+                            default:
+                                if(line.contains("Duplicate")) {
+                                    resp = "Unable to create account - e-mail already taken.";
+                                }
+                                else {
+                                    resp = "Unable to create account. "+line;
+                                }
+                        }
+                        final String finalResp1 = resp;
+                        if(line.equals("success")) {
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    dialog.dismiss();
+                                    login(finalResp1);
+                                }
+                            });
+                        }
+                        else {
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(MainActivity.this, finalResp1, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                        break;
+                    case LOGIN:
+                        switch(line) {
+                            case "success":
+                                resp = "Login successful.";
+                                Data.email = enteredEmail;
+                                Data.loggedIn = true;
+                                break;
+                            case "inactive":
+                                resp = "You have not activated your account yet.\n" +
+                                        "Follow the link in the e-mail to activate.";
+                                break;
+                            case "userdne":
+                                resp = "No account exists with this e-mail address.\n" +
+                                        "Try again or create an account.";
+                                break;
+                            case "wrongpass":
+                                resp = "Incorrect password, try again.";
+                                break;
+                            default:
+                                resp = "Login failed. "+line; break;
+                        }
+
+                        final String finalResp2 = resp;
+                        if(line.equals("success")) {
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(MainActivity.this, finalResp2, Toast.LENGTH_LONG).show();
+                                    dialog.dismiss();
+                                    writeEmailToFile();
+                                    readDataFromCloud();
+                                }
+                            });
+                        }
+                        else {
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(MainActivity.this, finalResp2, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                        break;
+                    case ADD_DATA:
+                        switch(line) {
+                            case "success":
+                                Log.d(tag, "ADD_DATA: Data added successfully.");
+                                resp = "Data added to cloud storage successfully.";
+                                break;
+                            default:
+                                Log.d(tag, "ADD_DATA: Error="+line);
+                                resp = line;
+                                break;
+                        }
+                        final String finalResp3 = resp;
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(MainActivity.this, finalResp3, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        break;
+                    case READ_DATA:
+                        // Parse json data
+                        String currentlyInUSA=null, monthOfLastUpdate=null, dayOfLastUpdate=null;
+                        String months[] = new String[12];
+                        JSONArray jArray = new JSONArray(line);
+
+                        for(int i=0; i<jArray.length();i++){
+                            JSONObject json = jArray.getJSONObject(i);
+                            months[0] = json.getString("jan");  months[1] = json.getString("feb");  months[2] = json.getString("mar");
+                            months[3] = json.getString("apr");  months[4] = json.getString("may");  months[5] = json.getString("jun");
+                            months[6] = json.getString("jul");  months[7] = json.getString("aug");  months[8] = json.getString("sep");
+                            months[9] = json.getString("oct");  months[10] = json.getString("nov");  months[11] = json.getString("dec");
+                            currentlyInUSA = json.getString("currentlyInUSA"); monthOfLastUpdate = json.getString("monthOfLastUpdate");
+                            dayOfLastUpdate = json.getString("dayOfLastUpdate");
+                        }
+
+                        for(int i=0; i<12; i++) { // For each month
+                            for(int j=0; j<31; j++) { // For each day of the month
+                                switch(months[i].charAt(j)) { // Extract single character from corresponding String
+                                    case '0':
+                                        Data.inUSA[i][j] = false;
+                                        break;
+                                    default:
+                                        Data.inUSA[i][j] = true;
+                                        break;
+                                }
+                            }
+                        }
+                        updateNumDaysInUSA();
+                        try {
+                            Data.currentCountry = (currentlyInUSA.equals("0") ? Country.CANADA : Country.USA);
+                        } catch(NullPointerException e) {
+                            Data.currentCountry = Country.CANADA;
+                            e.printStackTrace();
+                        }
+                        Data.monthOfLastUpdate = (byte) (Integer.parseInt(monthOfLastUpdate)-1);
+                        Data.dayOfLastUpdate = (byte) (Integer.parseInt(dayOfLastUpdate)-1);
+
+                        Log.d(tag, "READ_DATA: Updated currentCountry="+Data.currentCountry+", " +
+                                "monthOfLastUpdate="+Data.monthOfLastUpdate+", dayOfLastUpdate="+Data.dayOfLastUpdate);
+                        handler.post(new Runnable() {
+                                         @Override
+                                         public void run() {
+                                             updateDataAndDisplay();
+                                         }
+                                     });
+                        break;
+                    case SEND_ACTIVATION_EMAIL:
+                        switch(line) {
+                            case "1":
+                                Log.d(tag, "SEND_ACTIVATION_EMAIL: E-mail accepted to be sent.");
+                                resp = "You should receive an e-mail shortly to activate your account.";
+                                break;
+                            default:
+                                Log.d(tag, "SEND_ACTIVATION_EMAIL: Error="+line);
+                                resp = line;
+                                break;
+                        }
+                        final String finalResp4 = resp;
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(MainActivity.this, finalResp4, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        break;
+                    case CHECK_IF_ACTIVATED:
+                        switch(line) {
+                            case "true":
+                                Log.d(tag, "CHECK_IF_ACTIVATED: Activated.");
+                                resp = "Account has been activated.";
+                                break;
+                            case "false":
+                                Log.d(tag, "CHECK_IF_ACTIVATED: Not activated.");
+                                resp = "Account has not been activated.";
+                                break;
+                            default:
+                                Log.d(tag, "CHECK_IF_ACTIVATED: Error="+line);
+                                resp = line;
+                                break;
+                        }
+                        final String finalResp5 = resp;
+                        handler.post(new Runnable() {
+                            public void run() {
+                                Toast.makeText(MainActivity.this, finalResp5, Toast.LENGTH_LONG).show();
+                            }
+                        });
+                        break;
+                }
+            }
+            catch(Exception e) {
+                Log.d(tag, "Exception!");
+                e.printStackTrace();
+            }
+            return "";
         }
     }
 

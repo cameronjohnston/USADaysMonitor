@@ -48,7 +48,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
     TextView loggedInAsTV, titleTextView, backTV;
     Button loginButton, createAccountButton, logoutButton;
     ImageButton backButton;
-    Switch cloudStorageSwitch;
+    Switch minimizeDataUsageSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,14 +70,14 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
         loginButton = (Button) findViewById(R.id.loginButton);
         createAccountButton = (Button) findViewById(R.id.createAccountButton);
         logoutButton = (Button) findViewById(R.id.logoutButton);
-        cloudStorageSwitch = (Switch) findViewById(R.id.usingCloudStorageSwitch);
+        minimizeDataUsageSwitch = (Switch) findViewById(R.id.minimizeDataUsageSwitch);
 
         backButton.setOnClickListener(this);
         backTV.setOnClickListener(this);
         createAccountButton.setOnClickListener(this);
         loginButton.setOnClickListener(this);
         logoutButton.setOnClickListener(this);
-        cloudStorageSwitch.setOnClickListener(this);
+        minimizeDataUsageSwitch.setOnClickListener(this);
 
         imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 
@@ -104,18 +104,9 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
             Data.email = "";
             updateSettingsDisplay();
         }
-        else if(v == cloudStorageSwitch) {
-            Log.d(tag, "toggleCloudStorage: usingCloudStorage="+cloudStorageSwitch.isChecked());
-            Data.usingCloudStorage = cloudStorageSwitch.isChecked();
-            if(cloudStorageSwitch.isChecked()) {
-                try {
-                    if(!Data.email.equals(""))
-                        new DBQueryTask(Data.email, Query.ADD_DATA).execute();
-                }
-                catch(NullPointerException e) {
-                    e.printStackTrace();
-                }
-            }
+        else if(v == minimizeDataUsageSwitch) {
+            Data.mode = (minimizeDataUsageSwitch.isChecked() ? Mode.MINIMIZE_DATA_USAGE : Mode.REGULAR);
+            Log.d(tag, "Updated mode="+Data.mode);
         }
         else if(v == backButton || v == backTV) {
             Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
@@ -129,14 +120,14 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
             loginButton.setVisibility(Data.email.equals("") ? View.VISIBLE : View.INVISIBLE);
             createAccountButton.setVisibility(Data.email.equals("") ? View.VISIBLE : View.INVISIBLE);
             logoutButton.setVisibility(Data.email.equals("") ? View.INVISIBLE : View.VISIBLE);
-            cloudStorageSwitch.setVisibility(Data.email.equals("") ? View.INVISIBLE : View.VISIBLE);
+            minimizeDataUsageSwitch.setVisibility(Data.email.equals("") ? View.INVISIBLE : View.VISIBLE);
         }
         catch (NullPointerException e) {
             e.printStackTrace();
             loginButton.setVisibility(View.VISIBLE);
             createAccountButton.setVisibility(View.VISIBLE);
             logoutButton.setVisibility(View.INVISIBLE);
-            cloudStorageSwitch.setVisibility(View.INVISIBLE);
+            minimizeDataUsageSwitch.setVisibility(View.INVISIBLE);
         }
 
         updateUserDisplay();
@@ -178,8 +169,7 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
             @Override
             public void onClick(View v) {
                 imm.hideSoftInputFromWindow(retypeDialogET.getWindowToken(), 0);
-                new DBQueryTask(emailDialogET.getText().toString(), passwordDialogET.getText().toString(),
-                        retypeDialogET.getText().toString(), Query.CREATE_ACCOUNT).execute();
+                new DBQueryTask(emailDialogET.getText().toString(), passwordDialogET.getText().toString(), Query.CREATE_ACCOUNT).execute();
             }
         });
         cancelDialogButton.setOnClickListener(new View.OnClickListener() {
@@ -249,28 +239,19 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
 
     private class DBQueryTask extends AsyncTask<String, Void, String> {
         private final static String tag = "LoginTask";
-        private String enteredEmail, enteredPassword, enteredRetype;
+        private String enteredEmail, enteredPassword;
         private Query query;
 
         public DBQueryTask(String u, Query q) {
             Log.d(tag, "Entering constructor, u="+u+", q="+q);
             enteredEmail = u;
             enteredPassword = null;
-            enteredRetype = null;
             query = q;
         }
         public DBQueryTask(String u, String p, Query q) {
             Log.d(tag, "Entering constructor, u="+u+", p="+p+", q="+q);
             enteredEmail = u;
             enteredPassword = p;
-            enteredRetype = null;
-            query = q;
-        }
-        public DBQueryTask(String u, String p, String r, Query q) {
-            Log.d(tag, "Entering constructor, u="+u+", p="+p+", r="+r+", q="+q);
-            enteredEmail = u;
-            enteredPassword = p;
-            enteredRetype = r;
             query = q;
         }
 
@@ -286,12 +267,10 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
             try {
             switch(query) {
                 case CREATE_ACCOUNT:
-                    if(enteredPassword.equals(enteredRetype)) {
-                        url = "http://johnstonclan.ca/createUserWithoutData.php?email=" +
-                                enteredEmail + "&password=" + enteredPassword;
-                        Log.d(tag, "Attempting to create account with email="
-                                + enteredEmail + ", password=" + enteredPassword);
-                    }
+                    url = "http://johnstonclan.ca/createUserWithoutData.php?email=" +
+                            enteredEmail + "&password=" + enteredPassword;
+                    Log.d(tag, "Attempting to create account with email="
+                            + enteredEmail + ", password=" + enteredPassword);
                     break;
                 case LOGIN:
                     url = "http://johnstonclan.ca/login.php?email=" +
@@ -327,38 +306,17 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
                     url = "http://johnstonclan.ca/checkIfActivated.php?email="+enteredEmail;
                     Log.d(tag, "Checking if account activated: "+enteredEmail);
                     break;
-                case CHECK_IF_USING_CLOUD:
-                    url = "http://johnstonclan.ca/checkIfUsingCloudStorage.php?email="+enteredEmail;
-                    Log.d(tag, "Checking if using cloud storage: "+enteredEmail);
-                    break;
-                case DISABLE_CLOUD:
-                    url = "http://johnstonclan.ca/setUsingCloudStorage.php?email="+enteredEmail+"&using=0";
-                    Log.d(tag, "Disabling cloud storage for "+enteredEmail);
-                    break;
             }
-                // Send query to DB, unless CREATE_ACCOUNT and password mismatch
-                if(query != Query.CREATE_ACCOUNT || enteredPassword.equals(enteredRetype)) {
-                    client = new DefaultHttpClient();
-                    response = client.execute(new HttpGet(url));
-                    entity = response.getEntity();
-                    isr = entity.getContent();
-                    // Convert response to string
-                    reader = new BufferedReader(new InputStreamReader(isr,"iso-8859-1"),8);
-                    line = reader.readLine();
-                    Log.d(tag, "Reading line: "+line);
-                    isr.close();
-                }
-                else { // CREATE_ACCOUNT password mismatch
-                    Log.d(tag, "Unable to create account - password mismatch.");
-                    resp = "Unable to create account - passwords do not match.";
-                    final String finalResp1 = resp;
-                    handler.post(new Runnable() {
-                        public void run() {
-                            Toast.makeText(SettingsActivity.this, finalResp1, Toast.LENGTH_LONG).show();
-                        }
-                    });
-                    return "";
-                }
+                // Send query to DB
+                client = new DefaultHttpClient();
+                response = client.execute(new HttpGet(url));
+                entity = response.getEntity();
+                isr = entity.getContent();
+                // Convert response to string
+                reader = new BufferedReader(new InputStreamReader(isr,"iso-8859-1"),8);
+                line = reader.readLine();
+                Log.d(tag, "Reading line: "+line);
+                isr.close();
 
                 switch(query) {
                     case CREATE_ACCOUNT:
@@ -529,46 +487,6 @@ public class SettingsActivity extends ActionBarActivity implements View.OnClickL
                         handler.post(new Runnable() {
                             public void run() {
                                 Toast.makeText(SettingsActivity.this, finalResp5, Toast.LENGTH_LONG).show();
-                            }
-                        });
-                        break;
-                    case CHECK_IF_USING_CLOUD:
-                        switch(line) {
-                            case "true":
-                                Log.d(tag, "CHECK_IF_USING_CLOUD: Using cloud storage.");
-                                resp = "Using cloud storage.";
-                                break;
-                            case "false":
-                                Log.d(tag, "CHECK_IF_USING_CLOUD: Not using cloud storage.");
-                                resp = "Not using cloud storage.";
-                                break;
-                            default:
-                                Log.d(tag, "CHECK_IF_USING_CLOUD: Error="+line);
-                                resp = line;
-                                break;
-                        }
-                        final String finalResp7 = resp;
-                        handler.post(new Runnable() {
-                            public void run() {
-                                Toast.makeText(SettingsActivity.this, finalResp7, Toast.LENGTH_LONG).show();
-                            }
-                        });
-                        break;
-                    case DISABLE_CLOUD:
-                        switch(line) {
-                            case "success":
-                                Log.d(tag, "DISABLE_CLOUD: Success.");
-                                resp = "Successfully disabled cloud storage.";
-                                break;
-                            default:
-                                Log.d(tag, "DISABLE_CLOUD: Error="+line);
-                                resp = line;
-                                break;
-                        }
-                        final String finalResp8 = resp;
-                        handler.post(new Runnable() {
-                            public void run() {
-                                Toast.makeText(SettingsActivity.this, finalResp8, Toast.LENGTH_LONG).show();
                             }
                         });
                         break;

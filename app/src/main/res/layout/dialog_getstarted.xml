@@ -2,6 +2,17 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/getting_started_message"
+        android:id="@+id/textView"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:textSize="14sp" />
+
     <EditText
         android:id="@+id/emailDialogEditText"
         android:layout_width="fill_parent"
@@ -20,14 +31,23 @@
         android:layout_marginTop="4dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="4dp"
         android:hint="@string/password"/>
+    <EditText
+        android:id="@+id/retypePasswordDialogEditText"
+        android:inputType="textPassword"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="16dp"
+        android:hint="@string/retype_password"/>
 
-    <Button android:layout_width="144dp"
+    <Button android:layout_width="180dp"
         android:layout_height="60dp"
         android:layout_gravity="center_horizontal"
-        android:id="@+id/loginDialogButton"
-        android:text="@string/login"
+        android:id="@+id/createAccountDialogButton" android:text="@string/create_account"
         android:background="@drawable/button_selector"
         android:textColor="@color/white" />
 
@@ -42,18 +62,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="12dp"
-            android:text="@string/no_account_yet"
+            android:text="@string/already_have_account"
             android:textSize="16sp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/create_one"
+            android:text="@string/login_"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/usaflagrevisedblue"
             android:clickable="true"
             android:textIsSelectable="false"
-            android:id="@+id/createAccountTextView" />
+            android:id="@+id/loginTextView" />
     </LinearLayout>
-
 </LinearLayout>

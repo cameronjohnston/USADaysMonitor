@@ -54,10 +54,10 @@
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:text="@string/use_cloud_storage"
-        android:id="@+id/usingCloudStorageSwitch"
+        android:text="@string/minimize_data_usage"
+        android:id="@+id/minimizeDataUsageSwitch"
         android:layout_centerHorizontal="true"
-        android:textSize="22sp"
+        android:textSize="18sp"
         android:checked="false"
         android:layout_below="@+id/linearLayout2"
         android:thumb="@color/usaflagrevisedblue" />

@@ -16,6 +16,7 @@ public class Data {
     static final String FILENAME_COUNTRY = "current_country.txt";
     static final String FILENAME_TIMESTAMP = "timestamp.txt";
     static final String FILENAME_EMAIL = "email.txt";
+    static final String FILENAME_MODE = "mode.txt";
 
     static Country currentCountry;
     static boolean[][] inUSA;
@@ -23,6 +24,7 @@ public class Data {
     static int numDaysInUSA;
     static Calendar today;
 
-    static boolean usingCloudStorage;
+    static Mode mode;
     static String email;
+    static boolean loggedIn;
 }
