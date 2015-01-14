@@ -1,8 +1,11 @@
 package com.caniborrowyourphone.usa;
 
 import android.app.ActionBar;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -16,7 +19,11 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,15 +36,22 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 
     private static String tag = "CalendarView";
 
+    Dialog dialog;
+    final Handler handler = new Handler();
+
     int selectedMonth, dayOfWeek, resID;
     android.app.ActionBar actionBar;
     ImageButton prevMonthButton, nextMonthButton, backButton;
     Spinner selectMonthSpinner;
     Button[][] dayButtons;
-    Button thisDayButton;
+    Button thisDayButton, editDaysButton, saveChangesButton, discardChangesButton;
     String nameOfThisDayButton;
-    TextView numDaysThisMonthTV, backTV, loggedInAsTV, titleTextView;
+    TextView backTV, loggedInAsTV, titleTextView;
     LinearLayout calendarLinearLayout;
+    FileOutputStream fos;
+    boolean editing, changesMade, buttonClicked;
+    boolean[][] inUSA_old, inUSAThisMonth;
+    byte[] outputBytes;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +71,6 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
         backButton = (ImageButton) findViewById(R.id.backButton);
 		
 		selectMonthSpinner = (Spinner) findViewById(R.id.selectMonthSpinner);
-        numDaysThisMonthTV = (TextView) findViewById(R.id.numDaysThisMonthTextView);
         backTV = (TextView) findViewById(R.id.backTextView);
         loggedInAsTV = (TextView) findViewById(R.id.loggedInAsTextView);
         titleTextView = (TextView) findViewById(R.id.titleTextView);
@@ -65,13 +78,20 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 
         calendarLinearLayout = (LinearLayout) findViewById(R.id.calendarLinearLayout);
 
+        editDaysButton = (Button) findViewById(R.id.editDaysButton);
+        saveChangesButton = (Button) findViewById(R.id.saveChangesButton);
+        discardChangesButton = (Button) findViewById(R.id.discardChangesButton);
+
+        editing = false;
+        outputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
+
         initializeSpinner();
 
         setButtonOnClickListeners();
 
         addItemSelectedListenerToSpinner();
 
-        updateCalendarDisplay(false);
+        updateCalendarDisplay(selectMonthSpinner.getSelectedItemPosition()==0);
 
         Log.d(tag, "Exiting onCreate");
 	}
@@ -117,7 +137,6 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
             }
 
         });
-
         nextMonthButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -129,13 +148,70 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
             }
 
         });
+        editDaysButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                editing = true;
+                changesMade = false;
+                inUSA_old = new boolean[12][31];
+                for(int i=0; i<12; i++)
+                    System.arraycopy(Data.inUSA[i], 0, inUSA_old[i], 0, 31);
+                editDaysButton.setVisibility(View.INVISIBLE);
+                saveChangesButton.setVisibility(View.VISIBLE);
+                discardChangesButton.setVisibility(View.VISIBLE);
+                Toast.makeText(CalendarView.this, "Click on a day to change whether you were in the USA.", Toast.LENGTH_LONG).show();
+                updateCalendarDisplay(selectMonthSpinner.getSelectedItemPosition()==0);
+            }
+
+        });
+        saveChangesButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if(changesMade) {
+                    saveOrDiscardChanges(true, false);
+                }
+                else {
+                    editing = false;
+                    editDaysButton.setVisibility(View.VISIBLE);
+                    saveChangesButton.setVisibility(View.INVISIBLE);
+                    discardChangesButton.setVisibility(View.INVISIBLE);
+                }
+            }
+
+        });
+        discardChangesButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if(changesMade) {
+                    saveOrDiscardChanges(false, true);
+                }
+                else {
+                    editing = false;
+                    editDaysButton.setVisibility(View.VISIBLE);
+                    saveChangesButton.setVisibility(View.INVISIBLE);
+                    discardChangesButton.setVisibility(View.INVISIBLE);
+                }
+            }
+
+        });
         backButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
-                myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivityForResult(myIntent, 0);
+                if(editing && changesMade) {
+                    Log.d(tag, "changesMade. Calling saveOrDiscardChanges");
+                    saveOrDiscardChanges(false, false);
+                    // After Dialog has completed, it will send a Runnable to handler with the code below.
+                    // This will create an Intent and restart MainActivity.
+                }
+                else {
+                    Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+                    myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    startActivityForResult(myIntent, 0);
+                }
             }
 
         });
@@ -143,21 +219,114 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
 
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
-                myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivityForResult(myIntent, 0);
+                if(editing && changesMade) {
+                    Log.d(tag, "changesMade. Calling saveOrDiscardChanges");
+                    saveOrDiscardChanges(false, false);
+                    // After Dialog has completed, it will send a Runnable to handler with the code below.
+                    // This will create an Intent and restart MainActivity.
+                }
+                else {
+                    Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+                    myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    startActivityForResult(myIntent, 0);
+                }
             }
 
         });
+    }
 
+    void saveOrDiscardChanges(final boolean saving, final boolean discarding) {
+        dialog = new Dialog(this);
+        dialog.setCanceledOnTouchOutside(false);
+        // Set GUI of login screen
+        dialog.setContentView(R.layout.dialog_areyousure);
+        if(saving || discarding) dialog.setTitle("Are You Sure?");
+        else dialog.setTitle("Save Changes?");
+
+        Button confirmDialogButton = (Button) dialog.findViewById(R.id.confirmDialogButton);
+        Button cancelDialogButton = (Button) dialog.findViewById(R.id.cancelDialogButton);
+        TextView infoDialogTV = (TextView) dialog.findViewById(R.id.infoDialogTextView);
+
+        if(saving) {
+            infoDialogTV.setText(R.string.save_changes_message);
+            confirmDialogButton.setText("Save");
+            cancelDialogButton.setText("Cancel");
+        }
+        else if(discarding) {
+            infoDialogTV.setText(R.string.discard_changes_message);
+            confirmDialogButton.setText("Discard");
+            cancelDialogButton.setText("Cancel");
+        }
+        else {
+            infoDialogTV.setText(R.string.discard_or_save_changes_message);
+            confirmDialogButton.setText("Save");
+            cancelDialogButton.setText("Discard");
+        }
+        confirmDialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editing = false;
+                editDaysButton.setVisibility(View.VISIBLE);
+                saveChangesButton.setVisibility(View.INVISIBLE);
+                discardChangesButton.setVisibility(View.INVISIBLE);
+                if(discarding) {
+                    for (int i = 0; i < 12; i++)
+                        System.arraycopy(inUSA_old[i], 0, Data.inUSA[i], 0, 31);
+                }
+                else {
+                    writeDaysToFile();
+                }
+                dialog.dismiss();
+                updateCalendarDisplay(selectMonthSpinner.getSelectedItemPosition()==0);
+                if(!saving && !discarding) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+                            myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            startActivityForResult(myIntent, 0);
+                        }
+                    });
+                }
+            }
+        });
+        cancelDialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!saving && !discarding) {
+                    editing = false;
+                    editDaysButton.setVisibility(View.VISIBLE);
+                    saveChangesButton.setVisibility(View.INVISIBLE);
+                    discardChangesButton.setVisibility(View.INVISIBLE);
+                    for (int i = 0; i < 12; i++)
+                        System.arraycopy(inUSA_old[i], 0, Data.inUSA[i], 0, 31);
+                    updateCalendarDisplay(selectMonthSpinner.getSelectedItemPosition()==0);
+                    buttonClicked = true;
+                }
+                dialog.dismiss();
+                if(!saving && !discarding) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+                            myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                            startActivityForResult(myIntent, 0);
+                        }
+                    });
+                }
+            }
+        });
+        dialog.show();
+        Log.d(tag, "Exiting saveOrDiscardChanges. Dialog should be showing.");
     }
 
     private void updateCalendarDisplay(boolean prevYearFlag) {
+        Data.today = Calendar.getInstance();
         int dayOfMonth = 0;
-        int numDaysThisMonth = 0;
         boolean thisWeekVisible = true;
         boolean sameMonthAsToday, dayAfterToday, doNotDisplay;
         dayButtons = new Button[6][7];
+        inUSAThisMonth = new boolean[6][7];
         Calendar c = Calendar.getInstance();
         // Set c to the first day of the selected month
         if((Data.today.get(Calendar.MONTH) < selectedMonth) || prevYearFlag)
@@ -190,6 +359,7 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
                 }
                 resID = getResources().getIdentifier(nameOfThisDayButton, "id", getPackageName());
                 thisDayButton = (Button) findViewById(resID);
+                dayButtons[i][j] = thisDayButton;
                 if(i==0 && j < (dayOfWeek-1)) { // not yet in month
                     thisDayButton.setBackgroundColor(getResources().getColor(R.color.white));
                     thisDayButton.setText("");
@@ -200,11 +370,50 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
                     thisDayButton.setVisibility(View.VISIBLE);
                     thisDayButton.setText(String.valueOf(dayOfMonth));
                     if((Data.inUSA[c.get(Calendar.MONTH)][dayOfMonth - 1]) && !doNotDisplay) {
-                        numDaysThisMonth++;
+                        Log.d(tag, "Reading Data.inUSA=true for ["+c.get(Calendar.MONTH)+"]["+(dayOfMonth - 1)+"]");
+                        inUSAThisMonth[i][j] = true;
                         thisDayButton.setBackgroundResource(R.drawable.usaflag64x64_revisedblue2);
                     }
                     else {
                         thisDayButton.setBackgroundColor(getResources().getColor(R.color.white));
+                    }
+
+                    // Set OnClickListener for edit mode:
+                    final int iFinal = i, jFinal = j;
+                    final Calendar cFinal = c;
+                    if(doNotDisplay) {
+                        dayButtons[i][j].setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if(selectMonthSpinner.getSelectedItemPosition()==0)
+                                    Toast.makeText(CalendarView.this, "Invalid change - Day is over 12 months ago, " +
+                                            "and is now irrelevant for your tracking purposes.", Toast.LENGTH_LONG).show();
+                                else Toast.makeText(CalendarView.this, "Invalid change - Day is in the future. " +
+                                        "This is not a time travel app!", Toast.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                    else {
+                        dayButtons[i][j].setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (editing) {
+                                    Log.d(tag, "Click detected at [" + iFinal + "][" + jFinal + "]");
+                                    changesMade = true;
+                                    if (inUSAThisMonth[iFinal][jFinal]) {
+                                        dayButtons[iFinal][jFinal].setBackgroundColor(getResources().getColor(R.color.white));
+                                        inUSAThisMonth[iFinal][jFinal] = false;
+                                        Log.d(tag, "Setting entry of inUSA to false: [" + cFinal.get(Calendar.MONTH) + "][" + dayButtons[iFinal][jFinal].getText());
+                                        Data.inUSA[cFinal.get(Calendar.MONTH)][(Integer.parseInt((String) dayButtons[iFinal][jFinal].getText())) - 1] = false;
+                                    } else {
+                                        dayButtons[iFinal][jFinal].setBackgroundResource(R.drawable.usaflag64x64_revisedblue2);
+                                        inUSAThisMonth[iFinal][jFinal] = true;
+                                        Log.d(tag, "Setting entry of inUSA to true: [" + cFinal.get(Calendar.MONTH) + "][" + dayButtons[iFinal][jFinal].getText());
+                                        Data.inUSA[cFinal.get(Calendar.MONTH)][(Integer.parseInt((String) dayButtons[iFinal][jFinal].getText())) - 1] = true;
+                                    }
+                                }
+                            }
+                        });
                     }
                 }
                 else { // past month
@@ -223,23 +432,25 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
                 }
             }
         }
-        numDaysThisMonthTV.setText(String.valueOf(numDaysThisMonth));
     }
 
     private void updateUserDisplay() {
         try {
             if (Data.email.equals("")) {
-                loggedInAsTV.setVisibility(View.INVISIBLE);
-                calendarLinearLayout.setPadding(0, 0, 0, 0);
+                Data.loggedIn = false;
+                writeEmailToFile();
+                Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+                myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                startActivityForResult(myIntent, 0);
             } else {
                 loggedInAsTV.setText(Data.email);
-                calendarLinearLayout.setPadding(0, (int) ((16 * getResources().getDisplayMetrics().density + 0.5f)), 0, 0);
-                loggedInAsTV.setVisibility(View.VISIBLE);
             }
         }
         catch (NullPointerException e) {
-            loggedInAsTV.setVisibility(View.INVISIBLE);
-            calendarLinearLayout.setPadding(0, 0, 0, 0);
+            Data.loggedIn = false;
+            Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
+            myIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+            startActivityForResult(myIntent, 0);
             e.printStackTrace();
         }
     }
@@ -294,6 +505,44 @@ public class CalendarView extends ActionBarActivity implements OnItemSelectedLis
                 return 31;
             default:
                 return 31;
+        }
+    }
+
+    private void writeEmailToFile() {
+        try {
+            Log.d(tag, "writeEmailToFile: Opening file: " + Data.FILENAME_EMAIL);
+            fos = openFileOutput(Data.FILENAME_EMAIL, Context.MODE_PRIVATE);
+
+            Log.d(tag, "writeEmailToFile: Writing email to file: " + Data.email);
+            if (Data.email != null) fos.write(Data.email.getBytes());
+            fos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void writeDaysToFile() {
+        int i, j;
+        int index = 0;
+        for(i=0; i<12; i++) {
+            for(j=0; j<31; j++) {
+                outputBytes[index++] = (byte) (Data.inUSA[i][j] ? 1 : 0);
+            }
+        }
+        try {
+            Log.d(tag, "writeDaysToFile: Opening file: " + Data.FILENAME_DAYS);
+            fos = openFileOutput(Data.FILENAME_DAYS, Context.MODE_PRIVATE);
+        } catch (FileNotFoundException e1) {
+            Log.e(tag, "writeDaysToFile: FileNotFoundException");
+            e1.printStackTrace();
+        }
+        try {
+            Log.d(tag, "writeDaysToFile: Writing outputBytes to file: " + Data.FILENAME_DAYS);
+            fos.write(outputBytes);
+            fos.close();
+        } catch (IOException e) {
+            Log.e(tag, "writeDaysToFile: IOException when trying to write to FileOutputStream");
+            e.printStackTrace();
         }
     }
 

@@ -4,6 +4,17 @@
     android:layout_height="match_parent"
     tools:context="com.caniborrowyourphone.usa.CalendarView" >
 
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="48dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/loggedInAsTextView"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="@color/usaflagrevisedblue"
+        android:gravity="center"
+        android:textSize="16sp" />
+
     <LinearLayout
         android:id="@+id/calendarLinearLayout"
         android:orientation="horizontal"
@@ -11,6 +22,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/loggedInAsTextView"
+        android:layout_marginTop="8dp"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:layout_centerHorizontal="true">
@@ -376,35 +388,47 @@
 
     </TableLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:text="@string/num_days_selected_month_text_view"
-        android:id="@+id/numDaysThisMonthHeaderTextView"
-        android:textSize="15sp"
-        android:layout_below="@+id/calendarTableLayout"
-        android:layout_centerHorizontal="true" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/none"
-        android:id="@+id/numDaysThisMonthTextView"
-        android:textSize="30sp"
-        android:layout_below="@+id/numDaysThisMonthHeaderTextView"
+    <Button android:layout_width="144dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/editDaysButton" android:text="@string/edit_days"
+        android:background="@drawable/button_selector"
+        android:textColor="@color/white"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:textColor="@color/usaflagred" />
-    <TextView
+        android:layout_marginBottom="12dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="fill_parent"
-        android:layout_height="48dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text=""
-        android:id="@+id/loggedInAsTextView"
-        android:layout_alignParentTop="true"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="12dp"
         android:layout_centerHorizontal="true"
-        android:background="@color/usaflagrevisedblue"
-        android:gravity="center"
-        android:textSize="16sp" />
+        android:gravity="center_horizontal">
+
+        <Button
+            android:layout_width="144dp"
+            android:layout_height="fill_parent"
+            android:text="@string/save_changes"
+            android:id="@+id/saveChangesButton"
+            android:background="@drawable/button_selector"
+            android:textColor="@color/white"
+            android:layout_marginRight="10dp"
+            android:visibility="invisible"
+            android:textSize="16sp" />
+
+        <Button
+            android:layout_width="144dp"
+            android:layout_height="fill_parent"
+            android:text="@string/discard_changes"
+            android:id="@+id/discardChangesButton"
+            android:background="@drawable/button_selector"
+            android:textColor="@color/white"
+            android:layout_marginLeft="10dp"
+            android:visibility="invisible"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 
 </RelativeLayout>

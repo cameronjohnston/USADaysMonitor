@@ -9,11 +9,14 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.telephony.TelephonyManager;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -57,7 +60,7 @@ public class MainActivity extends ActionBarActivity {
 
     android.support.v7.app.ActionBar actionBar;
     InputMethodManager imm;
-    Dialog dialog;
+    Dialog dialog, dialog2;
 
     private FileInputStream fis;
     private byte[] inputBytes, outputBytes, twoOutputBytes;
@@ -65,8 +68,11 @@ public class MainActivity extends ActionBarActivity {
 
     Button enteringCanadaButton, enteringUSAButton;
 	TextView headerTV, locationTV, numDaysTV, loggedInAsTV;
+
 	LocationManager locationManager;
     LocationListener locationListener;
+    ConnectivityManager connManager;
+    NetworkInfo mWifi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +88,7 @@ public class MainActivity extends ActionBarActivity {
         findViewById(R.id.backButton).setVisibility(View.INVISIBLE);
         findViewById(R.id.backTextView).setVisibility(View.INVISIBLE);
 
+        connManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
         enteringCanadaButton = (Button) findViewById(R.id.enteringCanadaButton);
@@ -90,7 +97,7 @@ public class MainActivity extends ActionBarActivity {
         enteringUSAButton.setBackgroundResource(R.drawable.usaflag800x421_revisedblue2);
 
         setButtonOnClickListeners();
-        setLocationListener();
+        setLocationListener(); // LocationListener will only be used if locationManager is set to receive updates
 
         headerTV = (TextView) findViewById(R.id.headerTextView);
         locationTV = (TextView) findViewById(R.id.locationTextView);
@@ -124,6 +131,24 @@ public class MainActivity extends ActionBarActivity {
                 Data.loggedIn = true;
                 writeEmailToFile();
                 readLocalData();
+                if(Data.usingLocation) {
+                    String provider = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getNetworkOperatorName();
+                    try {
+                        if (provider.equals("")) {
+                            Log.d(tag, "No provider found, cannot set locationManager to send updates to LocationListener.");
+                        }
+                        else {
+                            Log.d(tag, "Found provider: "+provider+". Setting locationManager to send updates to LocationListener.");
+                            locationManager.requestLocationUpdates(provider, 1000 * 60 * 10, 1000, locationListener);
+                        }
+                    } catch(NullPointerException e) {
+                        Log.d(tag, "Provider=null, cannot set locationManager to send updates to LocationListener.");
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    locationManager.removeUpdates(locationListener);
+                }
                 updateDataAndDisplay();
             }
         }
@@ -186,6 +211,7 @@ public class MainActivity extends ActionBarActivity {
         dialog.setTitle("Login to your account");
         Button loginDialogButton = (Button) dialog.findViewById(R.id.loginDialogButton);
         TextView createAccountTV = (TextView) dialog.findViewById(R.id.createAccountTextView);
+        TextView forgotPasswordTV = (TextView) dialog.findViewById(R.id.forgotPasswordTextView);
         final EditText emailDialogET = (EditText)dialog.findViewById(R.id.emailDialogEditText);
         final EditText passwordDialogET = (EditText)dialog.findViewById(R.id.passwordDialogEditText);
         passwordDialogET.setTypeface(Typeface.DEFAULT);
@@ -206,10 +232,17 @@ public class MainActivity extends ActionBarActivity {
                 getStarted();
             }
         });
+        forgotPasswordTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imm.hideSoftInputFromWindow(passwordDialogET.getWindowToken(), 0);
+                forgotPassword();
+            }
+        });
         dialog.show();
         if(!accountCreatedMessage.equals("")) {
             Log.d(tag, "Creating new Dialog with accountCreatedMessage="+accountCreatedMessage);
-            final Dialog dialog2 = new Dialog(this);
+            dialog2 = new Dialog(this);
             dialog2.setCanceledOnTouchOutside(false);
             // Set GUI of login screen
             dialog2.setContentView(R.layout.dialog_accountcreated);
@@ -229,12 +262,44 @@ public class MainActivity extends ActionBarActivity {
         Log.d(tag, "Exiting login. LoginDialog should have just started.");
     }
 
-    protected void initializeData() {
+    void forgotPassword() {
+        dialog2 = new Dialog(this);
+        dialog2.setCanceledOnTouchOutside(false);
+        // Set GUI of login screen
+        dialog2.setContentView(R.layout.dialog_forgotpassword);
+        dialog2.setTitle("Forgot Password");
+
+        Button sendEmailDialogButton = (Button) dialog2.findViewById(R.id.sendEmailDialogButton);
+        Button cancelDialogButton = (Button) dialog2.findViewById(R.id.cancelDialogButton);
+        final EditText emailDialogET = (EditText)dialog2.findViewById(R.id.emailDialogEditText);
+
+        // Attached listener for login GUI button
+        sendEmailDialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imm.hideSoftInputFromWindow(emailDialogET.getWindowToken(), 0);
+                new DBQueryTask(emailDialogET.getText().toString(), Query.SEND_PASSWORD_EMAIL).execute();
+            }
+        });
+        cancelDialogButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imm.hideSoftInputFromWindow(emailDialogET.getWindowToken(), 0);
+                dialog2.dismiss();
+            }
+        });
+        dialog2.show();
+        Log.d(tag, "Exiting forgotPassword. ForgotPasswordDialog should have just started.");
+    }
+
+    void initializeData() {
         Data.inUSA = new boolean[12][31];
         Data.numDaysInUSA = 0;
         Data.monthOfLastUpdate = 0x0; // Should always be between 0-11 inclusive
         Data.dayOfLastUpdate = 0x0; // Should always be between 0-30 inclusive
         Data.today = Calendar.getInstance(); // Initialize to current date
+        Data.usingMobileData = true;
+        Data.usingLocation = true;
 
         inputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
         outputBytes = new byte[Data.NUM_BYTES_FOR_STORING_DAYS];
@@ -279,13 +344,18 @@ public class MainActivity extends ActionBarActivity {
 		});
 	}
 
+    /**
+     * Prepares the LocationListener to receive updates from the LocationManager.
+     * NOTE: onLocationChanged will only be called if the LocationManager is
+     * sending updates to the LocationListener.
+     */
     private void setLocationListener() {
         locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // Ensure that a Geocoder services is available
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
                     Log.d(tag, "onLocationChanged: Geocoder present, starting new GetAddressTask in background thread");
-                    (new GetAddressTask(getApplicationContext())).execute(location);
+                    (new GetAddressTask(MainActivity.this)).execute(location);
                 }
             }
             @Override
@@ -297,7 +367,7 @@ public class MainActivity extends ActionBarActivity {
         };
     }
 
-    protected Location createLocation(String provider, double lat, double lng, float accuracy) {
+    Location createLocation(String provider, double lat, double lng, float accuracy) {
         // Create a new Location
         Location newLocation = new Location(provider);
         newLocation.setLatitude(lat);
@@ -320,11 +390,13 @@ public class MainActivity extends ActionBarActivity {
 		readDaysFromFile();
         readCountryFromFile();
         readTimestampFromFile();
+        readSettingsFromFile();
         Log.d(tag, "Exiting readLocalData. numDaysInUSA=" + Data.numDaysInUSA);
 	}
 
     /**
      * Updates the day count display, then calls writeDataToFiles().
+     * If able to, based on the settings, then pushes user data to the cloud.
      */
     private void updateDayCount() {
         Log.d(tag, "Entering updateDayCount");
@@ -336,6 +408,10 @@ public class MainActivity extends ActionBarActivity {
 		}
 
         writeDataToFiles();
+        mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if(mWifi.isConnected() || (Data.usingMobileData && isNetworkAvailable())) {
+            new DBQueryTask(Data.email, Query.ADD_DATA).execute();
+        }
 
         Log.d(tag, "Exiting updateDayCount: numDaysInUSA=" + Data.numDaysInUSA);
 	}
@@ -666,6 +742,40 @@ public class MainActivity extends ActionBarActivity {
         Log.d(tag, "Exiting readEmailFromFile, email="+temp);
     }
 
+    private void readSettingsFromFile() {
+        Log.d(tag, "Entering readSettingsFromFile");
+        int numBytesRead = 0;
+        try {
+            fis = openFileInput(Data.FILENAME_SETTINGS);
+        } catch (FileNotFoundException e) {
+            Data.usingMobileData = true;
+            Data.usingLocation = true;
+            e.printStackTrace();
+            Log.d(tag, "readSettingsFromFile: FileNotFoundException, setting usingMobileData and usingLocation to TRUE and returning...");
+            return;
+        }
+
+        Log.d(tag, "readSettingsFromFile: File exists! Reading inputBytes...");
+        try {
+            numBytesRead = fis.read(inputBytes, 0, 2);
+            fis.close();
+        } catch (IOException e) {
+            Data.usingMobileData = true;
+            Data.usingLocation = true;
+            Log.e(tag, "readSettingsFromFile: IOException, setting usingMobileData and usingLocation to TRUE.");
+            e.printStackTrace();
+        }
+        if(numBytesRead > 1) {
+            Data.usingMobileData = (inputBytes[0] > 0);
+            Data.usingLocation = (inputBytes[1] > 0);
+            Log.d(tag, "readSettingsFromFile: usingMobileData="+Data.usingMobileData+", usingLocation="+Data.usingLocation);
+        }
+        else {
+            Log.d(tag, "readSettingsFromFile: numBytesRead < 2, returning...");
+        }
+        Log.d(tag, "Exiting readSettingsFromFile");
+    }
+
     private void readDataFromCloud() {
         Log.d(tag, "Reading data from cloud for email="+Data.email);
         new DBQueryTask(Data.email, Query.READ_DATA).execute();
@@ -799,6 +909,12 @@ public class MainActivity extends ActionBarActivity {
         return false;
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
     // This class copied from: http://developer.android.com/training/location/display-address.html
     private class GetAddressTask extends AsyncTask<Location, Void, String> {
@@ -951,6 +1067,10 @@ public class MainActivity extends ActionBarActivity {
                         url = "http://johnstonclan.ca/checkIfActivated.php?email="+enteredEmail;
                         Log.d(tag, "Checking if account activated: "+enteredEmail);
                         break;
+                    case SEND_PASSWORD_EMAIL:
+                        url = "http://johnstonclan.ca/sendForgotPasswordEmail.php?email="+enteredEmail;
+                        Log.d(tag, "Attempting to send forgot password email: "+enteredEmail);
+                        break;
                 }
                 // Send query to DB
                 client = new DefaultHttpClient();
@@ -1045,19 +1165,11 @@ public class MainActivity extends ActionBarActivity {
                         switch(line) {
                             case "success":
                                 Log.d(tag, "ADD_DATA: Data added successfully.");
-                                resp = "Data added to cloud storage successfully.";
                                 break;
                             default:
                                 Log.d(tag, "ADD_DATA: Error="+line);
-                                resp = line;
                                 break;
                         }
-                        final String finalResp3 = resp;
-                        handler.post(new Runnable() {
-                            public void run() {
-                                Toast.makeText(MainActivity.this, finalResp3, Toast.LENGTH_LONG).show();
-                            }
-                        });
                         break;
                     case READ_DATA:
                         // Parse json data
@@ -1144,6 +1256,39 @@ public class MainActivity extends ActionBarActivity {
                                 Toast.makeText(MainActivity.this, finalResp5, Toast.LENGTH_LONG).show();
                             }
                         });
+                        break;
+                    case SEND_PASSWORD_EMAIL:
+                        switch(line) {
+                            case "1":
+                                Log.d(tag, "SEND_PASSWORD_EMAIL: E-mail accepted to be sent.");
+                                resp = "You should receive an e-mail shortly with your account details.";
+                                break;
+                            case "userdne":
+                                resp = "No account exists with this e-mail address.\n" +
+                                        "Try again or create an account.";
+
+                                break;
+                            default:
+                                Log.d(tag, "SEND_PASSWORD_EMAIL: Error="+line);
+                                resp = line;
+                                break;
+                        }
+                        final String finalResp6 = resp;
+                        if(line.equals("1")) {
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(MainActivity.this, finalResp6, Toast.LENGTH_LONG).show();
+                                    dialog2.dismiss();
+                                }
+                            });
+                        }
+                        else {
+                            handler.post(new Runnable() {
+                                public void run() {
+                                    Toast.makeText(MainActivity.this, finalResp6, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
                         break;
                 }
             }
