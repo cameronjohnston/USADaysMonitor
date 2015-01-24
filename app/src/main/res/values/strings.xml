@@ -4,8 +4,9 @@
     <string name="app_name">USA Days Monitor</string>
     <string name="action_settings">Settings</string>
     <string name="entering_canada">Entering CAN</string>
+    <string name="leaving_usa">Leaving USA</string>
     <string name="entering_usa">Entering USA</string>
-    <string name="header_text_view">Days in the USA during the past 12 months:</string>
+    <string name="header_text_view">Days in the USA:</string>
     <string name="num_days_text_view">0</string>
     <string name="currently_in">Currently in:</string>
     <string name="canada">Canada</string>
@@ -105,6 +106,8 @@
         Supported:\nThis app was designed for Android smartphones, using location services
         to automatically track your country. iOS devices may be supported in the
         future.\n\nContact:\nGeneral inquiries and feedback can be sent to help@usadaysmonitor.com.</string>
+    <string name="edit_days_info_message">Click on a past day to change whether you were in the USA.
+        You can save or discard your changes at any point.</string>
     <string name="save_changes_message">If you hit save, your recent changes will overwrite the previous data.
         \n\nThis action cannot be undone.</string>
     <string name="discard_changes_message">If you hit discard, your recent changes will be lost.

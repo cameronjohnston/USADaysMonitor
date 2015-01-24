@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
-import android.telephony.TelephonyManager;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.Menu;
@@ -112,6 +111,15 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onStart() { super.onStart(); }
 
+    /*
+    protected void createLocationRequest() {
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+    */
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -132,14 +140,15 @@ public class MainActivity extends ActionBarActivity {
                 writeEmailToFile();
                 readLocalData();
                 if(Data.usingLocation) {
-                    String provider = ((TelephonyManager)this.getSystemService(Context.TELEPHONY_SERVICE)).getNetworkOperatorName();
+                    String provider = locationManager.getAllProviders().get(0);
                     try {
                         if (provider.equals("")) {
                             Log.d(tag, "No provider found, cannot set locationManager to send updates to LocationListener.");
                         }
                         else {
                             Log.d(tag, "Found provider: "+provider+". Setting locationManager to send updates to LocationListener.");
-                            locationManager.requestLocationUpdates(provider, 1000 * 60 * 10, 1000, locationListener);
+                            locationManager.requestLocationUpdates(provider, 1000 * 30, 100, locationListener);
+                            // (new GetAddressTask(MainActivity.this)).execute(locationManager.getLastKnownLocation(provider));
                         }
                     } catch(NullPointerException e) {
                         Log.d(tag, "Provider=null, cannot set locationManager to send updates to LocationListener.");
@@ -309,21 +318,20 @@ public class MainActivity extends ActionBarActivity {
 	private void setButtonOnClickListeners() {
 		enteringCanadaButton.setOnClickListener(new OnClickListener() {
 
-			@Override
-			public void onClick(View v) {
-                if(Data.USING_DUMMY_LOCATION_SERVICES) {
+            @Override
+            public void onClick(View v) {
+                if (Data.USING_DUMMY_LOCATION_SERVICES) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
                         (new GetAddressTask(getApplicationContext())).execute(createLocation("lsd", 49.25, -123.1, 3.0f)); // Vancouver, BC
                     }
-                }
-                else {
+                } else {
                     Data.currentCountry = Country.CANADA;
                     Data.today = Calendar.getInstance();
                     updateDataAndDisplay();
                 }
-			}
-			
-		});
+            }
+
+        });
 		
 		enteringUSAButton.setOnClickListener(new OnClickListener() {
 
@@ -355,6 +363,7 @@ public class MainActivity extends ActionBarActivity {
                 // Ensure that a Geocoder services is available
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD && Geocoder.isPresent()) {
                     Log.d(tag, "onLocationChanged: Geocoder present, starting new GetAddressTask in background thread");
+                    if(Data.DEBUGGING_LOCATION) Toast.makeText(MainActivity.this, "onLocationChanged - starting GetAddressTask", Toast.LENGTH_LONG).show();
                     (new GetAddressTask(MainActivity.this)).execute(location);
                 }
             }
@@ -972,7 +981,7 @@ public class MainActivity extends ActionBarActivity {
                  * city, and country name.
                  */
                 Log.d("GetAddressTask", "doInBackground - got address: "+address.toString());
-                String addressText = String.format(
+                final String addressText = String.format(
                         "%s, %s, %s",
                         // If there's a street address, add it
                         address.getMaxAddressLineIndex() > 0 ?
@@ -981,6 +990,7 @@ public class MainActivity extends ActionBarActivity {
                         address.getLocality(),
                         // The country of the address
                         address.getCountryName());
+
                 // Return the text
                 Log.d("GetAddressTask", "doInBackground: setting countryFromLocation to "+address.getCountryName());
                 String countryFromLocation = address.getCountryName();
@@ -988,6 +998,10 @@ public class MainActivity extends ActionBarActivity {
                 Data.today = Calendar.getInstance();
                 handler.post(new Runnable() {
                     public void run() {
+                        if(Data.DEBUGGING_LOCATION) {
+                            Log.d(tag, "Should be making Toast with address " + addressText);
+                            Toast.makeText(MainActivity.this, "Address: " + addressText, Toast.LENGTH_LONG).show();
+                        }
                         updateDataAndDisplay();
                     }
                 });

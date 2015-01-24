@@ -4,32 +4,23 @@
     android:layout_height="match_parent"
     tools:context="com.caniborrowyourphone.usa.CalendarView" >
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="48dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:id="@+id/loggedInAsTextView"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:background="@color/usaflagrevisedblue"
-        android:gravity="center"
-        android:textSize="16sp" />
-
     <LinearLayout
         android:id="@+id/calendarLinearLayout"
         android:orientation="horizontal"
         android:gravity="center_horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/loggedInAsTextView"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:layout_centerHorizontal="true">
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true">
 
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:id="@+id/prevMonthButton"
             android:background="@drawable/leftarrow64" />
 
@@ -43,6 +34,7 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:id="@+id/nextMonthButton"
             android:background="@drawable/rightarrow64" />
 
@@ -50,14 +42,16 @@
 
     <TableLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:layout_height="fill_parent"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="6dp"
         android:layout_below="@+id/calendarLinearLayout"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="100dp"
         android:id="@+id/calendarTableLayout">
 
         <TableRow>
@@ -140,250 +134,885 @@
                 android:background="@color/usaflagrevisedblue" />
         </TableRow>
 
-        <TableRow>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/sunButton1"
-                android:text="@string/Sun"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/monButton1"
-                android:text="@string/Mon"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/tueButton1"
-                android:text="@string/Tue"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/wedButton1"
-                android:text="@string/Wed"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/thuButton1"
-                android:text="@string/Thu"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/friButton1"
-                android:text="@string/Fri"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/satButton1"
-                android:text="@string/Sat"
-                android:textSize="15sp"/>
+        <TableRow 
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp">
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/sunImageView1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/sunTextView1"
+                    android:text="@string/Sun"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/monImageView1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/monTextView1"
+                    android:text="@string/Mon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/tueImageView1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/tueTextView1"
+                    android:text="@string/Tue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/wedImageView1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/wedTextView1"
+                    android:text="@string/Wed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/thuImageView1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/thuTextView1"
+                    android:text="@string/Thu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/friImageView1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/friTextView1"
+                    android:text="@string/Fri"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/satImageView1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/satTextView1"
+                    android:text="@string/Sat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            
         </TableRow>
 
-        <TableRow>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/sunButton2"
-                android:text="@string/Sun"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/monButton2"
-                android:text="@string/Mon"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/tueButton2"
-                android:text="@string/Tue"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/wedButton2"
-                android:text="@string/Wed"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/thuButton2"
-                android:text="@string/Thu"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/friButton2"
-                android:text="@string/Fri"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/satButton2"
-                android:text="@string/Sat"
-                android:textSize="15sp"/>
+        <TableRow
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp">
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/sunImageView2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/sunTextView2"
+                    android:text="@string/Sun"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/monImageView2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/monTextView2"
+                    android:text="@string/Mon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/tueImageView2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/tueTextView2"
+                    android:text="@string/Tue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/wedImageView2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/wedTextView2"
+                    android:text="@string/Wed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/thuImageView2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/thuTextView2"
+                    android:text="@string/Thu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/friImageView2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/friTextView2"
+                    android:text="@string/Fri"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/satImageView2"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/satTextView2"
+                    android:text="@string/Sat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+
         </TableRow>
 
-        <TableRow>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/sunButton3"
-                android:text="@string/Sun"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/monButton3"
-                android:text="@string/Mon"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/tueButton3"
-                android:text="@string/Tue"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/wedButton3"
-                android:text="@string/Wed"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/thuButton3"
-                android:text="@string/Thu"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/friButton3"
-                android:text="@string/Fri"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/satButton3"
-                android:text="@string/Sat"
-                android:textSize="15sp"/>
+        <TableRow
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp">
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/sunImageView3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/sunTextView3"
+                    android:text="@string/Sun"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/monImageView3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/monTextView3"
+                    android:text="@string/Mon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/tueImageView3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/tueTextView3"
+                    android:text="@string/Tue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/wedImageView3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/wedTextView3"
+                    android:text="@string/Wed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/thuImageView3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/thuTextView3"
+                    android:text="@string/Thu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/friImageView3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/friTextView3"
+                    android:text="@string/Fri"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/satImageView3"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/satTextView3"
+                    android:text="@string/Sat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+
         </TableRow>
 
-        <TableRow>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/sunButton4"
-                android:text="@string/Sun"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/monButton4"
-                android:text="@string/Mon"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/tueButton4"
-                android:text="@string/Tue"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/wedButton4"
-                android:text="@string/Wed"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/thuButton4"
-                android:text="@string/Thu"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/friButton4"
-                android:text="@string/Fri"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/satButton4"
-                android:text="@string/Sat"
-                android:textSize="15sp"/>
+        <TableRow
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp">
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/sunImageView4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/sunTextView4"
+                    android:text="@string/Sun"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/monImageView4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/monTextView4"
+                    android:text="@string/Mon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/tueImageView4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/tueTextView4"
+                    android:text="@string/Tue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/wedImageView4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/wedTextView4"
+                    android:text="@string/Wed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/thuImageView4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/thuTextView4"
+                    android:text="@string/Thu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/friImageView4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/friTextView4"
+                    android:text="@string/Fri"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/satImageView4"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/satTextView4"
+                    android:text="@string/Sat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+
         </TableRow>
 
-        <TableRow>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/sunButton5"
-                android:text="@string/Sun"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/monButton5"
-                android:text="@string/Mon"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/tueButton5"
-                android:text="@string/Tue"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/wedButton5"
-                android:text="@string/Wed"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/thuButton5"
-                android:text="@string/Thu"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/friButton5"
-                android:text="@string/Fri"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/satButton5"
-                android:text="@string/Sat"
-                android:textSize="15sp"/>
+        <TableRow
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp">
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/sunImageView5"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/sunTextView5"
+                    android:text="@string/Sun"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/monImageView5"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/monTextView5"
+                    android:text="@string/Mon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/tueImageView5"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/tueTextView5"
+                    android:text="@string/Tue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/wedImageView5"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/wedTextView5"
+                    android:text="@string/Wed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/thuImageView5"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/thuTextView5"
+                    android:text="@string/Thu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/friImageView5"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/friTextView5"
+                    android:text="@string/Fri"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/satImageView5"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/satTextView5"
+                    android:text="@string/Sat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+
         </TableRow>
 
-        <TableRow>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/sunButton6"
-                android:text="@string/Sun"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/monButton6"
-                android:text="@string/Mon"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/tueButton6"
-                android:text="@string/Tue"
-                android:textSize="15sp"
-                android:layout_width="wrap_content" />
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/wedButton6"
-                android:text="@string/Wed"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/thuButton6"
-                android:text="@string/Thu"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/friButton6"
-                android:text="@string/Fri"
-                android:textSize="15sp"/>
-            <Button
-                android:layout_weight="1"
-                android:id="@+id/satButton6"
-                android:text="@string/Sat"
-                android:textSize="15sp"/>
+        <TableRow
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:layout_marginLeft="2dp">
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/sunImageView6"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/sunTextView6"
+                    android:text="@string/Sun"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/monImageView6"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/monTextView6"
+                    android:text="@string/Mon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/tueImageView6"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/tueTextView6"
+                    android:text="@string/Tue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/wedImageView6"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/wedTextView6"
+                    android:text="@string/Wed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/thuImageView6"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/thuTextView6"
+                    android:text="@string/Thu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/friImageView6"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/friTextView6"
+                    android:text="@string/Fri"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="1dp"
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <ImageView android:clickable="true"
+                    android:id="@+id/satImageView6"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    
+                    android:adjustViewBounds="true" />
+                <TextView android:clickable="false"
+                    android:id="@+id/satTextView6"
+                    android:text="@string/Sat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18sp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="4dp" />
+            </RelativeLayout>
+
         </TableRow>
 
     </TableLayout>
@@ -394,18 +1023,18 @@
         android:id="@+id/editDaysButton" android:text="@string/edit_days"
         android:background="@drawable/button_selector"
         android:textColor="@color/white"
-        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="12dp" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="12dp"
         android:layout_centerHorizontal="true"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="16dp">
 
         <Button
             android:layout_width="144dp"
