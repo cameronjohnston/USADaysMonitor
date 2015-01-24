@@ -10,7 +10,7 @@ public class Data {
     private static final String tag = "Data";
 
     static final boolean USING_DUMMY_LOCATION_SERVICES = false;
-    static final boolean DEBUGGING_LOCATION = true;
+    static final boolean DEBUGGING_LOCATION = false;
 
     static final int NUM_BYTES_FOR_STORING_DAYS = 12*31;
     static final String FILENAME_DAYS = "usa_days_records.txt";
